@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudioMaster Pro - Digital Audio Mixing Console & Workstation</title>
   <meta name="description" content="Professional Studio Digital Audio Mixing Console with real-time Web Audio API, DSP rack, 60FPS visualizers, multi-track stems, input/output audio jack routing, broadcast auto-ducking, and MIDI controller support.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/mixer.css">
   <link rel="stylesheet" href="css/visualizers.css">
