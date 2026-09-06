@@ -2,17 +2,17 @@
  * StudioMaster Pro - Main Application Controller
  */
 
-import { AudioEngine } from './audio-engine.js';
-import { AudioVisualizer } from './audio-visualizer.js';
-import { AudioRecorder } from './audio-recorder.js';
-import { SynthDemo } from './synth-demo.js';
-import { SamplePads } from './sample-pads.js';
-import { MidiController } from './midi-controller.js';
-import { AudioEffects } from './audio-effects.js';
-import { AudioRouting } from './audio-routing.js';
-import { DspSuite } from './dsp-suite.js';
-import { AutoDucking } from './auto-ducking.js';
-import { VocalFx } from './vocal-fx.js';
+import { AudioEngine } from './audio-engine.js?v=3.0.4';
+import { AudioVisualizer } from './audio-visualizer.js?v=3.0.4';
+import { AudioRecorder } from './audio-recorder.js?v=3.0.4';
+import { SynthDemo } from './synth-demo.js?v=3.0.4';
+import { SamplePads } from './sample-pads.js?v=3.0.4';
+import { MidiController } from './midi-controller.js?v=3.0.4';
+import { AudioEffects } from './audio-effects.js?v=3.0.4';
+import { AudioRouting } from './audio-routing.js?v=3.0.4';
+import { DspSuite } from './dsp-suite.js?v=3.0.4';
+import { AutoDucking } from './auto-ducking.js?v=3.0.4';
+import { VocalFx } from './vocal-fx.js?v=3.0.4';
 
 class StudioApp {
   constructor() {

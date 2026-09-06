@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudioMaster Pro - Digital Audio Mixing Console & Workstation</title>
   <meta name="description" content="Professional Studio Digital Audio Mixing Console with real-time Web Audio API, DSP rack, 60FPS visualizers, multi-track stems, input/output audio jack routing, broadcast auto-ducking, and MIDI controller support.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/mixer.css">
-  <link rel="stylesheet" href="css/visualizers.css">
-  <link rel="stylesheet" href="css/dsp-suite.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.0.4">
+  <link rel="stylesheet" href="css/main.css?v=3.0.4">
+  <link rel="stylesheet" href="css/mixer.css?v=3.0.4">
+  <link rel="stylesheet" href="css/visualizers.css?v=3.0.4">
+  <link rel="stylesheet" href="css/dsp-suite.css?v=3.0.4">
 </head>
 <body>
 
@@ -686,6 +686,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Module Entry Point -->
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js?v=3.0.4"></script>
 </body>
 </html>
