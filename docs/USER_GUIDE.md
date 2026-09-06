@@ -124,7 +124,7 @@
 
 ---
 
-## 11. Audio I/O Routing (Input Aplikasi & Output Jack)
+## 11. Audio I/O Routing (Input Aplikasi, Output Jack, & Discord Setup)
 1. Klik tombol **"I/O Routing"** di header.
 2. **Pilih Output Jack Fisik**:
    - Pilih dropdown *Master Audio Output Jack* untuk mengarahkan suara ke Headphone, Speaker USB, atau Line Out tertentu.
@@ -132,6 +132,11 @@
    - Klik **"Pilih Jendela Aplikasi & Mulai Tangkap Audio"** (atau tombol hijau di header).
    - Pilih tab browser atau jendela aplikasi yang diinginkan dan **centang opsi "Share Audio / Bagikan Audio"**.
    - Fitur **Anti-Echo Loopback Protection** (`suppressLocalAudioPlayback`) otomatis aktif untuk mencegah suara ganda.
+4. **Mengalirkan Suara Mixer ke Discord / Game Voice Chat / Zoom**:
+   - Download dan install driver gratis **VB-Audio Cable** dari [Situs Resmi VB-Audio](https://vb-audio.com/Cable/).
+   - Di OverMix Pro (*I/O Routing* -> *Master Output*), pilih: **`CABLE Input (VB-Audio Virtual Cable)`**.
+   - Di Discord (*Settings -> Voice & Video -> Input Device*), pilih: **`CABLE Output (VB-Audio Virtual Cable)`**.
+   - Di Discord (*Noise Suppression*), pilih **`None`** agar suara musik & efek tidak terpotong filter noise Discord.
 
 ---
 

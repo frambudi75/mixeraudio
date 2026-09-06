@@ -642,13 +642,27 @@
         <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #8b5cf6;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <h4 style="font-size:13px; color:#c084fc; margin:0; display:flex; align-items:center; gap:6px;">
-              <span>🎛️</span> OPSI 3: Virtual Audio Cable / Stereo Mix (Semua Suara Windows/Linux)
+              <span>🎛️</span> OPSI 3: Virtual Audio Cable (Untuk Discord, Game, OBS)
             </h4>
-            <span style="font-size:10px; background:rgba(139,92,246,0.2); color:#c084fc; border:1px solid #8b5cf6; padding:2px 6px; border-radius:4px; font-weight:700;">NO POPUP</span>
+            <span style="font-size:10px; background:rgba(139,92,246,0.2); color:#c084fc; border:1px solid #8b5cf6; padding:2px 6px; border-radius:4px; font-weight:700;">PRO ROUTING</span>
           </div>
           <p style="font-size:11px; color:#94a3b8; line-height:1.4; margin-bottom:10px;">
-            Ingin <b>SEMUA suara laptop/PC</b> (Game, Spotify Desktop, Discord, VLC) otomatis masuk ke mixer tanpa pop-up layar? Gunakan driver loopback gratis seperti <i>VB-Audio Cable</i> atau <i>Stereo Mix</i> Windows/PulseAudio.
+            Ingin suara mixer (AutoTune, Voice Changer, Soundboard, Musik) mengalir langsung masuk ke <b>Discord, Game Voice Chat, Zoom, atau OBS</b>? Gunakan driver virtual kabel gratis <b>VB-Audio Cable</b>.
           </p>
+
+          <!-- Guide & Download Link Box -->
+          <div style="background:#090d14; border:1px solid #2e1d44; border-radius:6px; padding:10px; margin-bottom:10px; font-size:11px; color:#cbd5e1; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-weight:700; color:#c084fc;">💡 Cara Setup Masuk ke Discord / OBS:</div>
+            <div style="color:#94a3b8; line-height:1.4;">
+              1. Download & install driver <b>VB-Audio Cable</b> gratis di PC Anda.<br>
+              2. Pada <i>Master Output</i> di bawah, pilih: <b style="color:#38bdf8;">CABLE Input (VB-Audio)</b>.<br>
+              3. Di Discord (Settings -> Voice & Video), pada <i>Input Device</i> pilih: <b style="color:#4ade80;">CABLE Output (VB-Audio)</b>.
+            </div>
+            <a href="https://vb-audio.com/Cable/" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; background:#1e1430; border:1px solid #8b5cf6; color:#e9d5ff; padding:6px 12px; border-radius:4px; text-decoration:none; font-weight:700; font-size:11px; transition:all 0.2s ease;">
+              <span>🌐</span> Download Driver VB-Audio Cable (Situs Resmi Gratis) ↗
+            </a>
+          </div>
+
           <select id="virtual-cable-select" style="width:100%; background:#090d14; border:1px solid #3b485d; color:#fff; padding:8px 12px; border-radius:6px; font-size:12px;">
             <option value="default">Scan Otomatis Device Virtual Cable / Loopback...</option>
           </select>
