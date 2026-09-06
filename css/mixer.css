@@ -1,0 +1,550 @@
+/* ==========================================================================
+   StudioMaster Pro - Mixing Console & Channel Strips Architecture
+   ========================================================================== */
+
+.console-container {
+  display: flex;
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hardware);
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 640px;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) var(--bg-surface);
+}
+
+.console-container::-webkit-scrollbar {
+  height: 8px;
+}
+.console-container::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+.console-container::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+/* Strips Scrollable Area */
+.channel-strips-wrapper {
+  display: flex;
+  flex: 1;
+  min-width: min-content;
+}
+
+/* Empty State / Add Channel Card */
+.add-channel-strip {
+  width: 130px;
+  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.01);
+  padding: 20px 10px;
+  gap: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.add-channel-strip:hover {
+  background: rgba(6, 182, 212, 0.04);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.add-channel-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-elevated);
+  border: 1px dashed var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--accent-cyan);
+  transition: transform 0.2s ease;
+}
+
+.add-channel-strip:hover .add-channel-icon {
+  transform: scale(1.1);
+  border-color: var(--accent-cyan);
+}
+
+.add-channel-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   Individual Channel Strip
+   ========================================================================== */
+
+.channel-strip {
+  width: 138px;
+  min-width: 138px;
+  background: var(--bg-strip);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.channel-strip:nth-child(even) {
+  background: var(--bg-strip-alt);
+}
+
+.channel-strip.selected {
+  box-shadow: inset 0 0 0 1px var(--accent-cyan);
+}
+
+/* Strip Header & Scribble Strip */
+.strip-header {
+  padding: 8px 6px;
+  background: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.strip-number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.channel-color-tag {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--accent-blue);
+}
+
+.scribble-strip {
+  background: #000000;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  text-align: center;
+}
+
+.track-name-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.strip-source-badge {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 4px;
+}
+
+/* Strip DSP Sections */
+.strip-section {
+  padding: 8px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-title {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  align-self: flex-start;
+  padding-left: 4px;
+}
+
+/* Rotary Knob Component */
+.knob-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: ns-resize;
+  position: relative;
+  touch-action: none;
+}
+
+.knob-outer {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--grad-knob);
+  border: 2px solid #2a3242;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: border-color 0.15s ease;
+}
+
+.knob-control:hover .knob-outer {
+  border-color: var(--accent-cyan);
+}
+
+.knob-pointer {
+  position: absolute;
+  top: 4px;
+  width: 3px;
+  height: 10px;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  transform-origin: 50% 15px;
+}
+
+.knob-cyan .knob-pointer { background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan); }
+.knob-blue .knob-pointer { background: var(--accent-blue); box-shadow: 0 0 6px var(--accent-blue); }
+.knob-amber .knob-pointer { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+.knob-purple .knob-pointer { background: var(--accent-purple); box-shadow: 0 0 6px var(--accent-purple); }
+.knob-emerald .knob-pointer { background: var(--accent-emerald); box-shadow: 0 0 6px var(--accent-emerald); }
+
+.knob-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.knob-value {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* EQ Knobs Compact Grid */
+.eq-knobs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  align-items: center;
+}
+
+.knob-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+/* Switch & Function Buttons */
+.strip-switches {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 6px;
+}
+
+.btn-switch {
+  height: 24px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-switch:hover {
+  border-color: #4b5563;
+  color: var(--text-primary);
+}
+
+.btn-switch.btn-solo.active {
+  background: var(--led-solo);
+  color: #000;
+  border-color: #fde68a;
+  box-shadow: var(--led-solo-glow);
+}
+
+.btn-switch.btn-mute.active {
+  background: var(--led-mute);
+  color: #fff;
+  border-color: #fca5a5;
+  box-shadow: var(--led-mute-glow);
+}
+
+.btn-switch.btn-rec.active {
+  background: var(--led-rec);
+  color: #fff;
+  border-color: #f87171;
+  box-shadow: var(--led-rec-glow);
+}
+
+.btn-switch.btn-fx.active {
+  background: var(--accent-purple);
+  color: #fff;
+  border-color: #c4b5fd;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+}
+
+/* ==========================================================================
+   Fader & LED VU Meter Section
+   ========================================================================== */
+
+.strip-fader-section {
+  display: flex;
+  flex: 1;
+  padding: 10px 8px;
+  gap: 8px;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 220px;
+}
+
+/* LED Segment VU Meter */
+.vu-meter-container {
+  display: flex;
+  gap: 2px;
+  background: #000000;
+  padding: 3px 2px;
+  border-radius: 3px;
+  border: 1px solid #1e2530;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  height: 190px;
+}
+
+.vu-meter-channel {
+  width: 7px;
+  height: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  background: #0d1015;
+}
+
+.vu-led-segment {
+  flex: 1;
+  border-radius: 1px;
+  background: #181d24;
+  transition: background 0.05s ease, box-shadow 0.05s ease;
+}
+
+.vu-led-segment.green.active {
+  background: #10b981;
+  box-shadow: 0 0 4px #10b981;
+}
+
+.vu-led-segment.yellow.active {
+  background: #f59e0b;
+  box-shadow: 0 0 4px #f59e0b;
+}
+
+.vu-led-segment.red.active {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+}
+
+/* Precision Vertical Slider / Fader */
+.fader-track-area {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 44px;
+  justify-content: center;
+}
+
+.fader-scale-ticks {
+  position: absolute;
+  left: 2px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.fader-tick {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+.fader-tick.zero-db {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.fader-slot {
+  width: 8px;
+  height: 180px;
+  background: #050608;
+  border: 1px solid #232936;
+  border-radius: 4px;
+  position: relative;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+.fader-cap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 48px;
+  background: var(--grad-fader-cap);
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.fader-cap:active {
+  cursor: grabbing;
+  border-color: var(--accent-cyan);
+}
+
+.fader-cap-line {
+  width: 100%;
+  height: 2px;
+  background: #ffffff;
+  box-shadow: 0 0 4px #ffffff;
+}
+
+/* Fader Readout Badge */
+.fader-db-readout {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  background: #000;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  padding: 2px 4px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   Master Bus Strip (Right Section)
+   ========================================================================== */
+
+.master-strip {
+  width: 220px;
+  min-width: 220px;
+  background: var(--bg-master);
+  border-left: 2px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  right: 0;
+  z-index: 50;
+}
+
+.master-header {
+  padding: 10px 12px;
+  background: #251e33;
+  border-bottom: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.master-title {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #ff5252;
+  text-transform: uppercase;
+}
+
+.master-eq-rack {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.master-eq-sliders {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 70px;
+  background: #09080d;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #2d263d;
+}
+
+.graphic-eq-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.eq-band-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.eq-band-slider {
+  -webkit-appearance: slider-vertical;
+  width: 12px;
+  height: 48px;
+  accent-color: var(--accent-red);
+  cursor: pointer;
+}
+
+.master-fader-cap {
+  background: var(--grad-fader-cap-master);
+  border-color: #f87171;
+}
+
+.master-vu-large {
+  height: 220px;
+  width: 24px;
+}
+.master-vu-large .vu-meter-channel {
+  width: 10px;
+}

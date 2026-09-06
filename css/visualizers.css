@@ -1,0 +1,229 @@
+/* ==========================================================================
+   StudioMaster Pro - Visualizers, FX Racks & Soundboard Launchpad
+   ========================================================================== */
+
+/* Bottom & Secondary Visualizer / Tools Rack */
+.studio-bottom-rack {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+  min-height: 240px;
+}
+
+@media (max-width: 1200px) {
+  .studio-bottom-rack {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rack-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-hardware);
+  overflow: hidden;
+}
+
+.rack-card-header {
+  padding: 10px 16px;
+  background: var(--bg-surface-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rack-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rack-card-body {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: var(--bg-surface-sunken);
+}
+
+/* FFT Spectrum Analyzer Canvas */
+.spectrum-canvas {
+  width: 100%;
+  height: 180px;
+  background: #07090d;
+  border-radius: var(--radius-md);
+  border: 1px solid #1c2330;
+  display: block;
+}
+
+/* Stereo Phase Goniometer / Vectorscope Canvas */
+.vectorscope-canvas {
+  width: 100%;
+  height: 180px;
+  background: #05080c;
+  border-radius: var(--radius-md);
+  border: 1px solid #1a2230;
+  display: block;
+}
+
+/* ==========================================================================
+   Aux Return FX Rack (Reverb & Stereo Delay)
+   ========================================================================== */
+
+.fx-rack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.fx-unit {
+  background: #0c0e14;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fx-unit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 4px;
+}
+
+.fx-unit-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent-purple);
+  letter-spacing: 0.05em;
+}
+
+.fx-knobs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 0;
+}
+
+/* ==========================================================================
+   16-Pad Soundboard / Sampler Launchpad
+   ========================================================================== */
+
+.soundpad-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.sound-pad {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #1f2530, #13171f);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.sound-pad:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-2px);
+}
+
+.sound-pad:active, .sound-pad.triggered {
+  transform: translateY(1px);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  border-color: #67e8f9;
+  box-shadow: 0 0 18px rgba(6, 182, 212, 0.8), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.sound-pad.color-1 { border-bottom: 3px solid var(--accent-cyan); }
+.sound-pad.color-2 { border-bottom: 3px solid var(--accent-purple); }
+.sound-pad.color-3 { border-bottom: 3px solid var(--accent-amber); }
+.sound-pad.color-4 { border-bottom: 3px solid var(--accent-emerald); }
+
+.pad-key-hint {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-dim);
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-weight: 700;
+}
+
+.pad-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+/* ==========================================================================
+   Timeline / Waveform Multi-track Drawer
+   ========================================================================== */
+
+.timeline-rack {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-hardware);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeline-canvas-container {
+  height: 60px;
+  background: #080a0e;
+  border-radius: var(--radius-md);
+  border: 1px solid #1a202c;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.timeline-waveform-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.timeline-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+  pointer-events: none;
+}

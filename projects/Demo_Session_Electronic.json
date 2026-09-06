@@ -1,0 +1,16 @@
+{
+  "name": "Demo_Session_Electronic",
+  "date": "2026-09-06T10:00:00.000Z",
+  "bpm": 120,
+  "masterVolume": 1.0,
+  "masterEQ": [0, 0, 0, 0, 0],
+  "auxReverbDecay": 2.5,
+  "auxDelayTime": 0.35,
+  "auxDelayFeedback": 0.4,
+  "channels": [
+    { "id": 1, "name": "01 DRUMS", "gain": 0.9, "pan": 0, "trim": 0, "eqLow": 2, "eqMid": 0, "eqHigh": 1, "sendReverb": 0.1, "sendDelay": 0.0 },
+    { "id": 2, "name": "02 BASS", "gain": 0.85, "pan": 0, "trim": 0, "eqLow": 3, "eqMid": -1, "eqHigh": -2, "sendReverb": 0.0, "sendDelay": 0.0 },
+    { "id": 3, "name": "03 CHORDS", "gain": 0.75, "pan": -0.3, "trim": 0, "eqLow": -2, "eqMid": 1, "eqHigh": 2, "sendReverb": 0.35, "sendDelay": 0.25 },
+    { "id": 4, "name": "04 LEAD SYNTH", "gain": 0.75, "pan": 0.3, "trim": 0, "eqLow": -3, "eqMid": 2, "eqHigh": 3, "sendReverb": 0.4, "sendDelay": 0.3 }
+  ]
+}

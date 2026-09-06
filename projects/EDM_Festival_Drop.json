@@ -1,0 +1,16 @@
+{
+  "name": "EDM_Festival_Drop",
+  "date": "2026-09-06T10:00:00.000Z",
+  "bpm": 128,
+  "masterVolume": 1.1,
+  "masterEQ": [8, 4, -1, 3, 7],
+  "auxReverbDecay": 3.0,
+  "auxDelayTime": 0.23,
+  "auxDelayFeedback": 0.45,
+  "channels": [
+    { "id": 1, "name": "PUNCH KICK", "gain": 1.0, "pan": 0, "trim": 1, "eqLow": 6, "eqMid": -2, "eqHigh": 2, "sendReverb": 0.05, "sendDelay": 0.0 },
+    { "id": 2, "name": "SUB BASS 808", "gain": 0.95, "pan": 0, "trim": 2, "eqLow": 7, "eqMid": -3, "eqHigh": -2, "sendReverb": 0.0, "sendDelay": 0.0 },
+    { "id": 3, "name": "SAW LEADS", "gain": 0.85, "pan": -0.4, "trim": 0, "eqLow": -3, "eqMid": 2, "eqHigh": 6, "sendReverb": 0.45, "sendDelay": 0.35 },
+    { "id": 4, "name": "RISER FX", "gain": 0.80, "pan": 0.4, "trim": 0, "eqLow": -4, "eqMid": 1, "eqHigh": 5, "sendReverb": 0.60, "sendDelay": 0.50 }
+  ]
+}

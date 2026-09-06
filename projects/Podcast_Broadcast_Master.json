@@ -1,0 +1,16 @@
+{
+  "name": "Podcast_Broadcast_Master",
+  "date": "2026-09-06T10:00:00.000Z",
+  "bpm": 110,
+  "masterVolume": 1.0,
+  "masterEQ": [1, 2, 0, 3, 2],
+  "auxReverbDecay": 1.2,
+  "auxDelayTime": 0.20,
+  "auxDelayFeedback": 0.1,
+  "channels": [
+    { "id": 1, "name": "HOST MIC", "gain": 1.0, "pan": 0, "trim": 2, "eqLow": 2, "eqMid": 1, "eqHigh": 3, "sendReverb": 0.05, "sendDelay": 0.0 },
+    { "id": 2, "name": "GUEST MIC", "gain": 1.0, "pan": 0, "trim": 2, "eqLow": 2, "eqMid": 1, "eqHigh": 3, "sendReverb": 0.05, "sendDelay": 0.0 },
+    { "id": 3, "name": "BGM MUSIC", "gain": 0.65, "pan": 0, "trim": -2, "eqLow": -1, "eqMid": -2, "eqHigh": 0, "sendReverb": 0.15, "sendDelay": 0.0 },
+    { "id": 4, "name": "SOUND FX", "gain": 0.85, "pan": 0, "trim": 0, "eqLow": 0, "eqMid": 0, "eqHigh": 2, "sendReverb": 0.1, "sendDelay": 0.0 }
+  ]
+}
