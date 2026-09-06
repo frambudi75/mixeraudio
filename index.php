@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudioMaster Pro - Digital Audio Mixing Console & Workstation</title>
-  <meta name="description" content="Professional Studio Digital Audio Mixing Console with real-time Web Audio API, DSP rack, 60FPS visualizers, multi-track stems, input/output audio jack routing, broadcast auto-ducking, and MIDI controller support.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.1.0">
-  <link rel="manifest" href="manifest.json?v=3.1.0">
+  <title>OverMix Pro - Digital Audio Mixing Console & Workstation</title>
+  <meta name="description" content="OverMix Pro - Professional Studio Digital Audio Mixing Console with real-time Web Audio API, DSP rack, 60FPS visualizers, multi-track stems, input/output audio jack routing, broadcast auto-ducking, and MIDI controller support.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.2.0">
+  <link rel="manifest" href="manifest.json?v=3.2.0">
   <meta name="theme-color" content="#06b6d4">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="stylesheet" href="css/main.css?v=3.1.0">
-  <link rel="stylesheet" href="css/mixer.css?v=3.1.0">
-  <link rel="stylesheet" href="css/visualizers.css?v=3.1.0">
-  <link rel="stylesheet" href="css/dsp-suite.css?v=3.1.0">
+  <link rel="stylesheet" href="css/main.css?v=3.2.0">
+  <link rel="stylesheet" href="css/mixer.css?v=3.2.0">
+  <link rel="stylesheet" href="css/visualizers.css?v=3.2.0">
+  <link rel="stylesheet" href="css/dsp-suite.css?v=3.2.0">
 </head>
 <body>
 
@@ -22,8 +22,8 @@
     <div class="brand-section">
       <div class="brand-logo">⚡</div>
       <div class="brand-info">
-        <h1>StudioMaster Pro</h1>
-        <span class="badge-version">DSP CONSOLE v3.1 MASTER</span>
+        <h1>OverMix Pro</h1>
+        <span class="badge-version">DSP CONSOLE v3.2 MASTER</span>
       </div>
     </div>
 
@@ -1243,14 +1243,14 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Module Entry Point -->
-  <script type="module" src="js/app.js?v=3.1.0"></script>
+  <script type="module" src="js/app.js?v=3.2.0"></script>
   
   <!-- PWA Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=3.1.0').then(reg => {
-          console.log('StudioMaster Pro PWA ServiceWorker Registered:', reg.scope);
+        navigator.serviceWorker.register('sw.js?v=3.2.0').then(reg => {
+          console.log('OverMix Pro PWA ServiceWorker Registered:', reg.scope);
         }).catch(err => {
           console.warn('ServiceWorker registration failed:', err);
         });

@@ -2,7 +2,7 @@
 
 ## 1. High-Level Architecture
 
-StudioMaster Pro dibangun dengan arsitektur **Client-Side DSP Engine** menggunakan Web Audio API native 64-bit float dan didukung oleh **Lightweight REST API (PHP)** untuk penyimpanan project dan aset audio.
+OverMix Pro dibangun dengan arsitektur **Client-Side DSP Engine** menggunakan Web Audio API native 64-bit float dan didukung oleh **Lightweight REST API (PHP)** untuk penyimpanan project dan aset audio.
 
 ```
 +-------------------------------------------------------------------------+

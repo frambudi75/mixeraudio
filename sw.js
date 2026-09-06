@@ -3,7 +3,7 @@
  * Enables PWA installability and fast asset caching
  */
 
-const CACHE_NAME = 'studiomaster-v3.2.0';
+const CACHE_NAME = 'overmix-pro-v3.2.0';
 const ASSETS_TO_CACHE = [
   './',
   'index.php',

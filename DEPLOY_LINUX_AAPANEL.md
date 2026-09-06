@@ -1,6 +1,6 @@
 # 🚀 Panduan Deployment ke aaPanel Linux Server (Nginx / Apache)
 
-Aplikasi **StudioMaster Pro v3.0 MASTER** dirancang 100% kompatibel dengan lingkungan Linux (Ubuntu, Debian, AlmaLinux, CentOS, Rocky Linux) pada **aaPanel**.
+Aplikasi **OverMix Pro v3.2 MASTER** dirancang 100% kompatibel dengan lingkungan Linux (Ubuntu, Debian, AlmaLinux, CentOS, Rocky Linux) pada **aaPanel**.
 
 ---
 

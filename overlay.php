@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudioMaster Pro - OBS Studio Stream Overlay</title>
+  <title>OverMix Pro - OBS Studio Stream Overlay</title>
   <style>
     * {
       box-sizing: border-box;
@@ -137,7 +137,7 @@
     <div class="obs-brand">
       <div class="obs-logo">⚡</div>
       <div>
-        <div class="obs-title">StudioMaster</div>
+        <div class="obs-title">OverMix Pro</div>
         <div class="obs-badge">🔴 ON-AIR MASTER</div>
       </div>
     </div>

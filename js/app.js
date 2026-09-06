@@ -71,7 +71,7 @@ class StudioApp {
     // Start timecode updater timer
     setInterval(() => this.updateTimecodeUI(), 40);
 
-    this.showToast('StudioMaster Pro v3.0 Siap. Buka "Studio DSP FX" atau tekan Spasi untuk Play!', 'info');
+    this.showToast('OverMix Pro v3.2 Siap. Buka "Studio DSP FX" atau tekan Spasi untuk Play!', 'info');
   }
 
   cacheDomElements() {

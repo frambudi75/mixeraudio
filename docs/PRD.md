@@ -1,10 +1,10 @@
 # Product Requirements Document (PRD)
-## StudioMaster Pro - Web-Based Digital Audio Mixing Console & Workstation
+## OverMix Pro - Web-Based Digital Audio Mixing Console & Workstation
 
 ---
 
 ## 1. Overview & Vision
-**StudioMaster Pro** adalah stasiun kerja audio digital (DAW / Digital Audio Console) berbasis web yang menghadirkan pengalaman mixing audio analog-digital hybrid kelas profesional langsung di peramban web modern tanpa memerlukan instalasi software berat.
+**OverMix Pro** adalah stasiun kerja audio digital (DAW / Digital Audio Console) berbasis web yang menghadirkan pengalaman mixing audio analog-digital hybrid kelas profesional langsung di peramban web modern tanpa memerlukan instalasi software berat.
 
 Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang untuk musisi, produser musik, podcaster, penyiar radio, gamer, dan live streamer yang membutuhkan kontrol mixing multi-track real-time, routing fleksibel antara aplikasi dan jack audio fisik, serta rangkaian pemroses sinyal digital (DSP FX) mutakhir.
 

@@ -1,5 +1,5 @@
 # Panduan Penggunaan Lengkap (User Guide)
-## StudioMaster Pro - Digital Audio Mixing Console & Workstation
+## OverMix Pro - Digital Audio Mixing Console & Workstation
 
 ---
 

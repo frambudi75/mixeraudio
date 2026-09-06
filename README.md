@@ -1,11 +1,11 @@
-# ⚡ StudioMaster Pro - Web-Based Digital Audio Mixing Console & Workstation
+# ⚡ OverMix Pro - Web-Based Digital Audio Mixing Console & Workstation
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Web Audio API](https://img.shields.io/badge/Web%20Audio%20API-64--Bit%20DSP-cyan.svg)
 ![Platform: XAMPP & aaPanel](https://img.shields.io/badge/Platform-XAMPP%20%7C%20aaPanel%20Linux-emerald.svg)
-![Version](https://img.shields.io/badge/Version-3.1%20MASTER-gold.svg)
+![Version](https://img.shields.io/badge/Version-3.2%20MASTER-gold.svg)
 
-> **StudioMaster Pro** adalah stasiun kerja mixing audio digital profesional berbasis web dengan performa DSP 64-bit float, routing fleksibel antara aplikasi & jack audio fisik, Auto-Tune vokal real-time, Multiband Stem isolation, 8 karakter Voice Changer, 18 preset studio instan, dan visualizer 60 FPS real-time.
+> **OverMix Pro** adalah stasiun kerja mixing audio digital profesional berbasis web dengan performa DSP 64-bit float, routing fleksibel antara aplikasi & jack audio fisik, Auto-Tune vokal real-time, Multiband Stem isolation, 8 karakter Voice Changer, 18 preset studio instan, dan visualizer 60 FPS real-time.
 
 ---
 
