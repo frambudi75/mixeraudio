@@ -14,15 +14,15 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 
 ### A. Podcaster & Live Streamer (Broadcast)
 - **Kebutuhan**: Menangkap suara dari mikrofon host & tamu, menggabungkannya dengan backsound dari Spotify/YouTube, dan menggunakan Auto-Ducking agar musik otomatis mengecil saat host berbicara.
-- **Fitur Utama**: Auto-Ducking Sidechain, Noise Gate, De-Esser, Live Mic Monitoring, Input Aplikasi (Capture Tab/Window).
+- **Fitur Utama**: Auto-Ducking Sidechain, Noise Gate, De-Esser, Live Mic Monitoring, Input Aplikasi (Capture Tab/Window), OBS Live Stream Transparent Overlay.
 
 ### B. Musisi & Produser Musik
-- **Kebutuhan**: Melakukan mixing multi-track stems, membentuk karakter tonal instrumen dengan 3-Band Parametric EQ & 5-Band Master EQ, menambahkan Reverb/Delay stereo, dan mengekspor hasil mixdown ke 16-Bit Lossless WAV atau Stems ZIP.
-- **Fitur Utama**: Multi-track synchronizer, 18 DSP Studio Presets, Algorithmic Reverb & Tape Delay, Stems Exporter, Master Glue Compressor & Brickwall Limiter.
+- **Kebutuhan**: Melakukan mixing multi-track stems, koreksi nada vokal otomatis (Auto-Tune), isolasi frekuensi instrumen (Stems), membentuk karakter tonal instrumen dengan 3-Band Parametric EQ & 10-Band Graphic EQ, menambahkan Reverb/Delay stereo, dan mengekspor hasil mixdown ke 16-Bit Lossless WAV atau Stems ZIP.
+- **Fitur Utama**: Live Auto-Tune Pro Studio, Multiband Stem Isolation Studio, Multi-track synchronizer, 18 DSP Studio Presets, Algorithmic Reverb & Tape Delay, Stems Exporter, Master Glue Compressor & Brickwall Limiter.
 
-### C. Live Performance & DJ / Content Creator
-- **Kebutuhan**: Memicu jingle dan sound effect secara instan melalui soundboard launchpad, mengontrol fader menggunakan USB MIDI Controller fisik, dan memvisualisasikan fase stereo.
-- **Fitur Utama**: 16-Pad Soundboard Sampler, Web MIDI API support, 60FPS FFT Spectrum Analyzer, Stereo Phase Vectorscope (Goniometer).
+### C. Live Performance, DJ & Content Creator
+- **Kebutuhan**: Memicu jingle dan sound effect secara instan melalui soundboard launchpad, modulasi suara vokal karakter (Voice Changer), mengontrol fader menggunakan USB MIDI Controller fisik, dan memvisualisasikan fase stereo.
+- **Fitur Utama**: 16-Pad Soundboard Sampler (Live Mic Record to Pad), Voice Changer Studio (8 Karakter), Web MIDI API support, 60FPS FFT Spectrum Analyzer, Stereo Phase Vectorscope (Goniometer).
 
 ---
 
@@ -33,7 +33,7 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Sumber Audio (Source Types)**:
   - Audio file buffer (WAV, MP3, OGG, FLAC, M4A).
   - Live Hardware Microphone / Line-In.
-  - Tangkapan Audio Internal Aplikasi (System/Browser/Spotify/Game loopback via `getDisplayMedia`).
+  - Tangkapan Audio Internal Aplikasi (System/Browser/Spotify/Game loopback via `getDisplayMedia` dengan proteksi anti-echo).
   - Synthesizer Demo Generator (Drums, 808 Bass, Synth Chords, Lead Arp).
 - **Transport Controls**: Play, Pause, Stop, Seek, Loop, BPM Metronome click generator, Real-time Timecode (MM:SS:ms).
 
@@ -59,29 +59,49 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Master Brickwall Limiter**: Ceiling -0.5 dB untuk mencegah distorsi digital.
 - **Master Output Device Selector**: Mengarahkan output master ke jack audio fisik tertentu (Headphone, Speaker, USB DAC) via `setSinkId`.
 
-### 3.5. Input Mix Hub & Anti-Echo Loopback Protection
-- **Anti-Echo Local Playback Suppression (`suppressLocalAudioPlayback: true`)**:
-  - Mengeliminasi 100% suara ganda / echo fase saat menangkap audio dari aplikasi browser/Spotify/YouTube.
-  - Mematikan output lokal aplikasi asli sehingga seluruh audio dialihkan secara murni melalui pemrosesan filter mixer.
-- **Pilihan Input Mix Fleksibel**:
-  - *Mode 1 (App / Tab Audio)*: Tangkap audio browser/tab/jendela aplikasi dengan proteksi anti-gema aktif.
-  - *Mode 2 (Physical Mic / Line-In)*: Mikrofon fisik / jack soundcard direct monitoring.
-  - *Mode 3 (Virtual Cable Loopback)*: Deteksi dan routing perangkat loopback OS (VB-Audio Virtual Cable / Stereo Mix) untuk menyaring semua suara PC secara otomatis tanpa dialog pop-up.
-  - *Mode 4 (Multi-Track Audio Stems / File Buffer)*: Pemutaran file rekaman independen per channel.
-### 3.6. Next-Gen Studio Powerhouse Suite (v3.1)
-- **📲 Progressive Web App (PWA)**:
-  - Beroperasi sebagai software aplikasi desktop/mobile mandiri (Standalone Window) tanpa address bar browser.
-  - Caching aset via Service Worker (`sw.js`) dan konfigurasi PWA (`manifest.json`).
-- **🤖 Live Voice Changer (Vocal FX Modulator)**:
-  - 6 Mode Suara Real-Time: Clean Studio, Robot Vocoder (Ring Modulation), Chipmunk (High Formant), Deep Monster (Sub-octave + Warm Drive), Alien Space (Dual LFO Wobbler), Megaphone AM (Bandpass + Hard Clipper).
-- **🎙️ Custom Soundboard Sampler (Pad 1 - 16)**:
-  - Klik kanan / opsi pada pad untuk merekam vokal/jingle langsung dari mikrofon ke dalam memori pad (Live Sampler 2s).
-  - Drag & drop file MP3/WAV milik pengguna ke masing-masing pad launchpad.
-- **📺 OBS Studio Transparent Streaming Overlay (`overlay.php`)**:
-  - Halaman widget tanpa latar belakang khusus OBS Browser Source (1920x1080 / 600x120 banner).
-  - Sinkronisasi telemetri 60FPS real-time (Spectrum Canvas, Dual VU Meter LED, Timecode, dan status Preset DSP via BroadcastChannel API).
-- **🎤 Real-Time Karaoke Mode (Mid-Side Vocal Suppressor)**:
-  - Algoritma Mid-Side Phase Cancellation yang memotong vokal penyanyi di kanal tengah mono sambil mempertahankan instrumen stereo dan bass kick.
+### 3.4. Next-Gen Studio Powerhouse Suite (v3.1)
+
+#### ⚡ A. Live Auto-Tune Pro Studio
+- **Autocorrelation Pitch Detection**: Algoritma pelacak nada vokal mikrofon real-time (60Hz s/d 1600Hz).
+- **Live Pitch & Cents Ribbon Display**: Menampilkan visualisasi nada yang terdeteksi vs nada target dalam skala beserta offset sen (-50 s/d +50 cents).
+- **7 Musical Scales & 12 Root Keys**: Major (Pop), Minor (Trap), Pentatonic (RnB), Blues, Chromatic (12-Tones), Arabic (Maqam), dan Japanese Hirajoshi.
+- **Retune Speed Control**: Dari 0 ms (*Hard Robotic T-Pain / Travis Scott*) hingga 100 ms (*Natural Vocal Pitch Assist*).
+- **Live Auto-Tune Monitor**: Mengalirkan suara mic termodulasi auto-tune ke master bus dan headphone loopback.
+
+#### 🎛️ B. Multiband Stem Isolation Studio
+- **4-Way Frequency Crossover Splitter**:
+  - 🎤 **Vocal Stem**: Isolasi artikulasi pita suara (220 Hz – 3.800 Hz).
+  - 🥁 **Drums & Percussion**: Isolasi transien pukulan snare & cymbals (> 7.500 Hz).
+  - 🎸 **Bass & Sub**: Isolasi sub-bass & bassline tebal (< 180 Hz).
+  - 🎹 **Instruments / Music**: Isolasi instrumen harmoni dan backing band (600 Hz – 7.500 Hz).
+- **Per-Stem Mute & Level Faders**: Fader volume independen dan tombol MUTE untuk tiap instrumen.
+- **One-Click Presets**: `Solo Acapella` (Vokal Murni) dan `Instrumental Only` (Karaoke Murni).
+
+#### 🤖 C. Live Voice Changer Studio
+- **8 Preset Karakter Suara Real-Time**:
+  - 🎙️ Clean Natural
+  - 🤖 Optimus Robot (Ring Modulation Vocoder)
+  - 🐿️ Chipmunk Anime (High Formant Shift +8ST)
+  - 👹 Darth Monster (Deep Sub-Growl -7ST)
+  - 👽 Alien Xenomorph (Dual LFO Modulation)
+  - 📢 Police Megaphone (Bandpass Mid + Saturation)
+  - 👻 Ghost Whisper (Airy Shimmer Delay + Space Reverb)
+  - 📻 1920s Vintage Radio (Lo-Fi Bandpass Filter)
+- **Parametric Fine-Tuning Sliders**: Pitch Shift (-12 s/d +12 ST), Tube Drive Saturation, dan FX Wet/Dry Blend.
+- **Live Microphone Monitor**: Direct low-latency headphone preview.
+
+#### 🎙️ D. 16-Pad Custom Soundboard & Launchpad Sampler
+- **Live Mic Record to Pad**: Merekam cuplikan vokal/jingle 2 detik langsung dari mic ke memori pad.
+- **Drag & Drop Audio Files**: Mengimpor file MP3/WAV milik user ke masing-masing pad.
+- **Keyboard Shortcuts Grid**: `1-4`, `Q-R`, `A-F`, `Z-V`.
+
+#### 📺 E. OBS Studio Transparent Streaming Overlay (`overlay.php`)
+- Widget khusus browser source OBS Studio tanpa background transparan.
+- Sinkronisasi telemetri 60FPS real-time (FFT Spectrum Canvas, Dual VU Meters, Timecode, Active DSP Preset) via `BroadcastChannel API`.
+
+#### 📲 F. Progressive Web App (PWA)
+- Beroperasi sebagai software aplikasi desktop/mobile mandiri (Standalone Window) tanpa browser bar.
+- Caching aset via Service Worker (`sw.js`) dan konfigurasi PWA (`manifest.json`).
 
 ---
 
@@ -91,5 +111,3 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Visual Performance**: 60 FPS Canvas rendering untuk FFT Spectrum dan Vectorscope.
 - **Cross-Platform Compatibility**: Windows (XAMPP), Linux (aaPanel / Ubuntu / Debian / CentOS / AlmaLinux), macOS.
 - **Browser Support**: Google Chrome, Microsoft Edge, Mozilla Firefox, Opera, Brave, Safari.
-
-
