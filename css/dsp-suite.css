@@ -344,3 +344,33 @@
   border-color: #ef4444;
   color: #ef4444;
 }
+
+/* Voice Changer Cards */
+.voice-card {
+  background: #121824;
+  border: 1px solid #233044;
+  border-radius: 10px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+
+.voice-card:hover {
+  background: #1e283b;
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.voice-card.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.2));
+  border-color: #a855f7;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5), inset 0 0 8px rgba(168, 85, 247, 0.3);
+}
+

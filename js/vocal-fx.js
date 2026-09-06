@@ -267,6 +267,9 @@ export class VocalFx {
     wetGain.connect(output);
 
     let currentMode = 'normal';
+    let wetMixVal = 1.0;
+    let driveVal = 25;
+    let pitchShiftVal = 0;
 
     const setVoiceMode = (mode) => {
       currentMode = mode;
@@ -274,7 +277,7 @@ export class VocalFx {
 
       // Default reset
       dryGain.gain.setTargetAtTime(0, t, 0.02);
-      wetGain.gain.setTargetAtTime(1.0, t, 0.02);
+      wetGain.gain.setTargetAtTime(wetMixVal, t, 0.02);
       lowShelf.gain.setTargetAtTime(0, t, 0.02);
       highFormant.gain.setTargetAtTime(0, t, 0.02);
       bpFilter.frequency.setTargetAtTime(1400, t, 0.02);
@@ -289,39 +292,39 @@ export class VocalFx {
         case 'robot':
           // Pure Ring Modulation
           carrierOsc.type = 'square';
-          carrierOsc.frequency.setTargetAtTime(55, t, 0.02);
+          carrierOsc.frequency.setTargetAtTime(55 + pitchShiftVal * 4, t, 0.02);
           bpFilter.frequency.setTargetAtTime(2000, t, 0.02);
           bpFilter.Q.setTargetAtTime(0.7, t, 0.02);
-          distortion.curve = makeDistCurve(15);
+          distortion.curve = makeDistCurve(driveVal || 15);
           break;
 
         case 'chipmunk':
           // High formant & bright harmonic lift
           carrierOsc.type = 'sine';
           carrierOsc.frequency.setTargetAtTime(8, t, 0.02);
-          highFormant.frequency.setTargetAtTime(2800, t, 0.02);
-          highFormant.gain.setTargetAtTime(14, t, 0.02);
-          bpFilter.frequency.setTargetAtTime(3200, t, 0.02);
+          highFormant.frequency.setTargetAtTime(2800 + pitchShiftVal * 80, t, 0.02);
+          highFormant.gain.setTargetAtTime(16, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(3400, t, 0.02);
           bpFilter.Q.setTargetAtTime(1.2, t, 0.02);
           break;
 
         case 'deep':
           // Monster deep sub-octave & warm drive
           carrierOsc.type = 'triangle';
-          carrierOsc.frequency.setTargetAtTime(35, t, 0.02);
-          lowShelf.frequency.setTargetAtTime(160, t, 0.02);
-          lowShelf.gain.setTargetAtTime(15, t, 0.02);
-          bpFilter.frequency.setTargetAtTime(800, t, 0.02);
+          carrierOsc.frequency.setTargetAtTime(32, t, 0.02);
+          lowShelf.frequency.setTargetAtTime(140, t, 0.02);
+          lowShelf.gain.setTargetAtTime(16, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(750, t, 0.02);
           bpFilter.Q.setTargetAtTime(0.8, t, 0.02);
-          distortion.curve = makeDistCurve(35);
+          distortion.curve = makeDistCurve(driveVal || 35);
           break;
 
         case 'alien':
           // Tremolo & rapid phase frequency shift
           carrierOsc.type = 'sawtooth';
-          carrierOsc.frequency.setTargetAtTime(110, t, 0.02);
-          alienLfo.frequency.setTargetAtTime(12, t, 0.02);
-          bpFilter.frequency.setTargetAtTime(1800, t, 0.02);
+          carrierOsc.frequency.setTargetAtTime(120, t, 0.02);
+          alienLfo.frequency.setTargetAtTime(14, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(1900, t, 0.02);
           bpFilter.Q.setTargetAtTime(2.5, t, 0.02);
           break;
 
@@ -330,7 +333,26 @@ export class VocalFx {
           carrierOsc.frequency.setTargetAtTime(0.1, t, 0.02);
           bpFilter.frequency.setTargetAtTime(1500, t, 0.02);
           bpFilter.Q.setTargetAtTime(3.5, t, 0.02);
-          distortion.curve = makeDistCurve(60);
+          distortion.curve = makeDistCurve(driveVal || 60);
+          break;
+
+        case 'ghost':
+          // High ethereal shimmer & modulation
+          carrierOsc.type = 'sine';
+          carrierOsc.frequency.setTargetAtTime(6, t, 0.02);
+          highFormant.frequency.setTargetAtTime(4500, t, 0.02);
+          highFormant.gain.setTargetAtTime(12, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(2200, t, 0.02);
+          bpFilter.Q.setTargetAtTime(1.5, t, 0.02);
+          break;
+
+        case 'radio':
+          // Vintage AM 1920s Radio
+          carrierOsc.type = 'sawtooth';
+          carrierOsc.frequency.setTargetAtTime(25, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(1200, t, 0.02);
+          bpFilter.Q.setTargetAtTime(4.0, t, 0.02);
+          distortion.curve = makeDistCurve(30);
           break;
       }
     };
@@ -341,7 +363,26 @@ export class VocalFx {
       input,
       output,
       setVoiceMode,
-      getMode: () => currentMode
+      getMode: () => currentMode,
+      setPitchShift(val) {
+        pitchShiftVal = val;
+        setVoiceMode(currentMode);
+      },
+      setDrive(amount) {
+        driveVal = amount;
+        distortion.curve = makeDistCurve(amount);
+      },
+      setWetMix(mix) {
+        wetMixVal = mix;
+        const t = audioCtx.currentTime;
+        if (currentMode !== 'normal') {
+          wetGain.gain.setTargetAtTime(mix, t, 0.02);
+          dryGain.gain.setTargetAtTime(1.0 - mix * 0.7, t, 0.02);
+        }
+      },
+      setModSpeed(hz) {
+        alienLfo.frequency.setTargetAtTime(hz, audioCtx.currentTime, 0.02);
+      }
     };
   }
 }

@@ -252,20 +252,114 @@ class StudioApp {
       });
     }
 
-    // 4. Live Voice Changer Selector (Robot, Chipmunk, Deep Monster, Alien, Megaphone)
-    const voiceSelect = document.getElementById('voice-changer-select');
-    if (voiceSelect) {
-      voiceSelect.addEventListener('change', async (e) => {
+    // 4. Live Voice Changer Studio Hub & Modal
+    const initVoiceNode = async () => {
+      await this.engine.init();
+      if (!this.voiceChangerNode) {
+        this.voiceChangerNode = VocalFx.createVoiceChanger(this.engine.ctx);
+        // Insert into Master Bus or dedicated Mic Bus
+        this.engine.masterBus.connect(this.voiceChangerNode.input);
+        this.voiceChangerNode.output.connect(this.engine.ctx.destination);
+      }
+      return this.voiceChangerNode;
+    };
+
+    this.safeOn('btn-open-voice-modal', 'click', async () => {
+      await initVoiceNode();
+      const modal = document.getElementById('voice-changer-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    // Voice Preset Cards
+    const voiceCards = document.querySelectorAll('.voice-card');
+    voiceCards.forEach(card => {
+      card.addEventListener('click', async () => {
+        const node = await initVoiceNode();
+        voiceCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const mode = card.dataset.voice;
+        node.setVoiceMode(mode);
+        this.showToast(`Voice Modulator: ${card.querySelector('span:nth-child(2)').textContent}`, 'success');
+      });
+    });
+
+    // Voice Studio Fine-Tuning Sliders
+    const pitchSlider = document.getElementById('slider-voice-pitch');
+    const pitchVal = document.getElementById('voice-pitch-val');
+    if (pitchSlider) {
+      pitchSlider.addEventListener('input', async (e) => {
+        const node = await initVoiceNode();
+        const val = parseInt(e.target.value);
+        node.setPitchShift(val);
+        if (pitchVal) pitchVal.textContent = `${val > 0 ? '+' : ''}${val} ST`;
+      });
+    }
+
+    const driveSlider = document.getElementById('slider-voice-drive');
+    const driveVal = document.getElementById('voice-drive-val');
+    if (driveSlider) {
+      driveSlider.addEventListener('input', async (e) => {
+        const node = await initVoiceNode();
+        const val = parseInt(e.target.value);
+        node.setDrive(val);
+        if (driveVal) driveVal.textContent = `${val}%`;
+      });
+    }
+
+    const mixSlider = document.getElementById('slider-voice-mix');
+    const mixVal = document.getElementById('voice-mix-val');
+    if (mixSlider) {
+      mixSlider.addEventListener('input', async (e) => {
+        const node = await initVoiceNode();
+        const val = parseInt(e.target.value);
+        node.setWetMix(val / 100);
+        if (mixVal) mixVal.textContent = `${val}%`;
+      });
+    }
+
+    // Live Mic Monitor for Voice Changer
+    let micMonitorStream = null;
+    let micMonitorSource = null;
+    const micMonitorBtn = document.getElementById('btn-toggle-mic-monitor');
+    if (micMonitorBtn) {
+      micMonitorBtn.addEventListener('click', async () => {
         await this.engine.init();
-        const mode = e.target.value;
-        if (!this.voiceChangerNode) {
-          this.voiceChangerNode = VocalFx.createVoiceChanger(this.engine.ctx);
-          // Connect to master or mic channel
-          this.engine.masterBus.connect(this.voiceChangerNode.input);
-          this.voiceChangerNode.output.connect(this.engine.ctx.destination);
+        const node = await initVoiceNode();
+
+        if (micMonitorStream) {
+          // Stop monitoring
+          micMonitorStream.getTracks().forEach(t => t.stop());
+          micMonitorStream = null;
+          if (micMonitorSource) {
+            try { micMonitorSource.disconnect(); } catch (err) {}
+            micMonitorSource = null;
+          }
+          micMonitorBtn.textContent = '🔴 Aktifkan Live Monitor';
+          micMonitorBtn.classList.remove('btn-accent-emerald');
+          micMonitorBtn.classList.add('btn-accent-purple');
+          this.showToast('Live Mic Monitor dimatikan.', 'info');
+        } else {
+          // Start monitoring
+          try {
+            micMonitorStream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: false,
+                autoGainControl: false,
+                latency: 0
+              }
+            });
+            micMonitorSource = this.engine.ctx.createMediaStreamSource(micMonitorStream);
+            micMonitorSource.connect(node.input);
+            micMonitorBtn.textContent = '🟢 Mic Monitor AKTIF (Live)';
+            micMonitorBtn.classList.remove('btn-accent-purple');
+            micMonitorBtn.classList.add('btn-accent-emerald');
+            this.showToast('Live Mic Monitor AKTIF! Bicara di mic untuk mendengar suaramu.', 'success');
+          } catch (err) {
+            console.error('Failed to start mic monitor:', err);
+            this.showToast('Gagal mengakses mikrofon: ' + err.message, 'error');
+          }
         }
-        this.voiceChangerNode.setVoiceMode(mode);
-        this.showToast(`Voice Changer: ${voiceSelect.options[voiceSelect.selectedIndex].text}`, 'success');
       });
     }
 

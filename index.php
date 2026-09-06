@@ -67,15 +67,10 @@
         <option value="yamaha">🎚️ Yamaha Digital 02R</option>
       </select>
 
-      <!-- Live Voice Changer Selector -->
-      <select id="voice-changer-select" style="background:#131822; border:1px solid #8b5cf6; color:#c084fc; font-size:11px; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;" title="Live Voice Changer (Robot, Chipmunk, Monster Deep, Alien, Megaphone)">
-        <option value="normal">🎙️ Voice: Clean Studio</option>
-        <option value="robot">🤖 Voice: Robot Vocoder</option>
-        <option value="chipmunk">🐿️ Voice: Chipmunk Up</option>
-        <option value="deep">😈 Voice: Deep Monster</option>
-        <option value="alien">👽 Voice: Alien Space</option>
-        <option value="megaphone">📢 Voice: Megaphone AM</option>
-      </select>
+      <!-- Live Voice Changer Studio Button & Selector -->
+      <button class="btn-action" id="btn-open-voice-modal" style="background:#1e1430; border-color:#8b5cf6; color:#c084fc;" title="Buka Studio Live Voice Changer (Robot, Chipmunk, Monster, Alien, Radio)">
+        🤖 Voice Studio
+      </button>
 
       <!-- Real-time Karaoke Vocal Cut -->
       <button class="btn-action" id="btn-toggle-karaoke" title="Karaoke Mode: Hilangkan Vokal Lagu secara Real-Time">
@@ -787,6 +782,118 @@
       </div>
       <div class="modal-footer">
         <button class="btn-action" onclick="document.getElementById('pad-editor-modal').classList.remove('active')">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 6: Studio Live Voice Changer & Vocal Pitch Modulator
+       ========================================================================== -->
+  <div class="modal-overlay" id="voice-changer-modal">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🤖</span>
+          <div>
+            <h3 style="margin:0; font-size:16px; color:#fff;">Live Voice Changer Studio</h3>
+            <p style="margin:0; font-size:11px; color:#94a3b8;">Ubah karakter vokal mikrofon Anda secara real-time untuk gaming, live streaming, podcast, dan discord.</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('voice-changer-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:14px; max-height:75vh; overflow-y:auto;">
+        
+        <!-- Live Mic Monitor Toggle -->
+        <div style="background:rgba(139, 92, 246, 0.1); border:1px solid rgba(139, 92, 246, 0.3); padding:12px 16px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:12px; font-weight:700; color:#e9d5ff;">🎧 Live Microphone Monitor</div>
+            <div style="font-size:10px; color:#c084fc;">Dengarkan langsung suara Anda di headphone saat berbicara di mic</div>
+          </div>
+          <button class="btn-action btn-accent-purple" id="btn-toggle-mic-monitor">🔴 Aktifkan Live Monitor</button>
+        </div>
+
+        <!-- 8 Character Presets Grid -->
+        <div>
+          <label style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px;">PILIHAN KARAKTER SUARA (PRESETS):</label>
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;" id="voice-preset-cards">
+            <button class="voice-card active" data-voice="normal">
+              <span style="font-size:24px;">🎙️</span>
+              <span style="font-size:11px; font-weight:700;">Clean Studio</span>
+              <span style="font-size:9px; color:#94a3b8;">Natural Vocal</span>
+            </button>
+            <button class="voice-card" data-voice="robot">
+              <span style="font-size:24px;">🤖</span>
+              <span style="font-size:11px; font-weight:700;">Optimus Robot</span>
+              <span style="font-size:9px; color:#94a3b8;">Ring Vocoder</span>
+            </button>
+            <button class="voice-card" data-voice="chipmunk">
+              <span style="font-size:24px;">🐿️</span>
+              <span style="font-size:11px; font-weight:700;">Chipmunk Anime</span>
+              <span style="font-size:9px; color:#94a3b8;">High Pitch Up</span>
+            </button>
+            <button class="voice-card" data-voice="deep">
+              <span style="font-size:24px;">😈</span>
+              <span style="font-size:11px; font-weight:700;">Darth Monster</span>
+              <span style="font-size:9px; color:#94a3b8;">Deep Sub-Growl</span>
+            </button>
+            <button class="voice-card" data-voice="alien">
+              <span style="font-size:24px;">👽</span>
+              <span style="font-size:11px; font-weight:700;">Alien Xenomorph</span>
+              <span style="font-size:9px; color:#94a3b8;">LFO Space Mod</span>
+            </button>
+            <button class="voice-card" data-voice="megaphone">
+              <span style="font-size:24px;">📢</span>
+              <span style="font-size:11px; font-weight:700;">Megaphone AM</span>
+              <span style="font-size:9px; color:#94a3b8;">Police Radio</span>
+            </button>
+            <button class="voice-card" data-voice="ghost">
+              <span style="font-size:24px;">👻</span>
+              <span style="font-size:11px; font-weight:700;">Ghost Whisper</span>
+              <span style="font-size:9px; color:#94a3b8;">Ethereal Shimmer</span>
+            </button>
+            <button class="voice-card" data-voice="radio">
+              <span style="font-size:24px;">📻</span>
+              <span style="font-size:11px; font-weight:700;">1920s Radio</span>
+              <span style="font-size:9px; color:#94a3b8;">Vintage Lo-Fi</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Parametric Fine-Tuning Sliders -->
+        <div style="background:#131822; padding:14px; border-radius:10px; border:1px solid #283344; display:flex; flex-direction:column; gap:12px;">
+          <div style="font-size:11px; font-weight:800; color:#38bdf8; text-transform:uppercase;">🎛️ PARAMETRIC FINE-TUNING</div>
+          
+          <!-- Pitch & Formant Shift Slider -->
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Pitch & Formant Shift</span>
+              <span style="font-family:var(--font-mono); color:#38bdf8; font-weight:700;" id="voice-pitch-val">0 ST</span>
+            </div>
+            <input type="range" class="dsp-slider-horizontal" id="slider-voice-pitch" min="-12" max="12" value="0" step="1">
+          </div>
+
+          <!-- Saturation / Drive -->
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Analog Tube Drive / Saturation</span>
+              <span style="font-family:var(--font-mono); color:#f59e0b; font-weight:700;" id="voice-drive-val">25%</span>
+            </div>
+            <input type="range" class="dsp-slider-horizontal" id="slider-voice-drive" min="0" max="100" value="25" style="accent-color:#f59e0b;">
+          </div>
+
+          <!-- FX Wet / Dry Mix -->
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Effect Wet / Dry Blend</span>
+              <span style="font-family:var(--font-mono); color:#a855f7; font-weight:700;" id="voice-mix-val">100%</span>
+            </div>
+            <input type="range" class="dsp-slider-horizontal" id="slider-voice-mix" min="0" max="100" value="100" style="accent-color:#a855f7;">
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('voice-changer-modal').classList.remove('active')">Tutup</button>
       </div>
     </div>
   </div>
