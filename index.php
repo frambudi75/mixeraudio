@@ -1045,52 +1045,52 @@
         </p>
 
         <!-- 4 Stems Channel Strips -->
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; background:#0d0a14; padding:14px; border-radius:10px; border:1px solid #2d2238;">
+        <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; background:#0d0a14; padding:12px 8px; border-radius:10px; border:1px solid #2d2238; box-sizing:border-box; width:100%;">
           
           <!-- Stem 1: Vocal -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
-            <span style="font-size:20px;">🎤</span>
-            <span style="font-size:11px; font-weight:800; color:#38bdf8;">VOCAL</span>
-            <input type="range" class="dsp-slider-vertical" id="slider-stem-vocal" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#38bdf8;">
-            <button class="btn-stem-mute" id="btn-mute-vocal" data-stem="vocal" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:#1a1426; padding:8px 4px; border-radius:8px; min-width:0; box-sizing:border-box;">
+            <span style="font-size:18px;">🎤</span>
+            <span style="font-size:10px; font-weight:800; color:#38bdf8;">VOCAL</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-vocal" min="0" max="150" value="100" orient="vertical" style="height:100px; accent-color:#38bdf8;">
+            <button class="btn-stem-mute" id="btn-mute-vocal" data-stem="vocal" style="font-size:9px; padding:3px 6px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer; width:100%; max-width:60px;">MUTE</button>
           </div>
 
           <!-- Stem 2: Drums -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
-            <span style="font-size:20px;">🥁</span>
-            <span style="font-size:11px; font-weight:800; color:#f59e0b;">DRUMS</span>
-            <input type="range" class="dsp-slider-vertical" id="slider-stem-drums" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#f59e0b;">
-            <button class="btn-stem-mute" id="btn-mute-drums" data-stem="drums" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:#1a1426; padding:8px 4px; border-radius:8px; min-width:0; box-sizing:border-box;">
+            <span style="font-size:18px;">🥁</span>
+            <span style="font-size:10px; font-weight:800; color:#f59e0b;">DRUMS</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-drums" min="0" max="150" value="100" orient="vertical" style="height:100px; accent-color:#f59e0b;">
+            <button class="btn-stem-mute" id="btn-mute-drums" data-stem="drums" style="font-size:9px; padding:3px 6px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer; width:100%; max-width:60px;">MUTE</button>
           </div>
 
           <!-- Stem 3: Bass -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
-            <span style="font-size:20px;">🎸</span>
-            <span style="font-size:11px; font-weight:800; color:#a855f7;">BASS</span>
-            <input type="range" class="dsp-slider-vertical" id="slider-stem-bass" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#a855f7;">
-            <button class="btn-stem-mute" id="btn-mute-bass" data-stem="bass" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:#1a1426; padding:8px 4px; border-radius:8px; min-width:0; box-sizing:border-box;">
+            <span style="font-size:18px;">🎸</span>
+            <span style="font-size:10px; font-weight:800; color:#a855f7;">BASS</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-bass" min="0" max="150" value="100" orient="vertical" style="height:100px; accent-color:#a855f7;">
+            <button class="btn-stem-mute" id="btn-mute-bass" data-stem="bass" style="font-size:9px; padding:3px 6px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer; width:100%; max-width:60px;">MUTE</button>
           </div>
 
           <!-- Stem 4: Instruments -->
-          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
-            <span style="font-size:20px;">🎹</span>
-            <span style="font-size:11px; font-weight:800; color:#10b981;">MUSIC</span>
-            <input type="range" class="dsp-slider-vertical" id="slider-stem-inst" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#10b981;">
-            <button class="btn-stem-mute" id="btn-mute-inst" data-stem="inst" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px; background:#1a1426; padding:8px 4px; border-radius:8px; min-width:0; box-sizing:border-box;">
+            <span style="font-size:18px;">🎹</span>
+            <span style="font-size:10px; font-weight:800; color:#10b981;">MUSIC</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-inst" min="0" max="150" value="100" orient="vertical" style="height:100px; accent-color:#10b981;">
+            <button class="btn-stem-mute" id="btn-mute-inst" data-stem="inst" style="font-size:9px; padding:3px 6px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer; width:100%; max-width:60px;">MUTE</button>
           </div>
 
         </div>
 
         <!-- Quick Preset Actions -->
-        <div style="display:flex; gap:8px;">
-          <button class="btn-action" id="btn-preset-acapella" style="flex:1; font-size:11px; font-weight:700; background:#0e2a38; border-color:#0284c7; color:#38bdf8;">
-            🎙️ Solo Acapella (Vocal Only)
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:6px; width:100%; box-sizing:border-box;">
+          <button class="btn-action" id="btn-preset-acapella" style="font-size:11px; font-weight:700; background:#0e2a38; border-color:#0284c7; color:#38bdf8; justify-content:center; padding:0 4px; white-space:nowrap;">
+            🎙️ Acapella
           </button>
-          <button class="btn-action" id="btn-preset-backing" style="flex:1; font-size:11px; font-weight:700; background:#2a1a0e; border-color:#d97706; color:#fbbf24;">
-            🎶 Instrumental Only (No Vocal)
+          <button class="btn-action" id="btn-preset-backing" style="font-size:11px; font-weight:700; background:#2a1a0e; border-color:#d97706; color:#fbbf24; justify-content:center; padding:0 4px; white-space:nowrap;">
+            🎶 Karaoke
           </button>
-          <button class="btn-action" id="btn-preset-reset-stems" style="flex:1; font-size:11px; font-weight:700;">
-            🔄 Reset All Stems
+          <button class="btn-action" id="btn-preset-reset-stems" style="font-size:11px; font-weight:700; justify-content:center; padding:0 4px; white-space:nowrap;">
+            🔄 Reset
           </button>
         </div>
 

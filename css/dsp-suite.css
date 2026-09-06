@@ -412,7 +412,10 @@
 .dsp-slider-vertical {
   -webkit-appearance: slider-vertical;
   writing-mode: bt-lr; /* IE/Edge */
+  width: 12px;
+  max-width: 100%;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 
