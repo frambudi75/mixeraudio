@@ -257,9 +257,8 @@ class StudioApp {
       await this.engine.init();
       if (!this.voiceChangerNode) {
         this.voiceChangerNode = VocalFx.createVoiceChanger(this.engine.ctx);
-        // Insert into Master Bus or dedicated Mic Bus
-        this.engine.masterBus.connect(this.voiceChangerNode.input);
-        this.voiceChangerNode.output.connect(this.engine.ctx.destination);
+        // Connect voice changer output to Master Bus
+        this.voiceChangerNode.output.connect(this.engine.masterBus);
       }
       return this.voiceChangerNode;
     };
