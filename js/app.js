@@ -362,6 +362,225 @@ class StudioApp {
       });
     }
 
+    // 5. Live Auto-Tune Pro Studio Hub
+    let autoTuneNode = null;
+    let atActiveRoot = 'C';
+    let atActiveScale = 'major';
+    let atMicStream = null;
+    let atMicSource = null;
+
+    const initAutoTuneNode = async () => {
+      await this.engine.init();
+      if (!autoTuneNode) {
+        autoTuneNode = VocalFx.createAutoTune(this.engine.ctx);
+        autoTuneNode.output.connect(this.engine.masterBus);
+
+        // Visual note pitch meter callback
+        const noteEl = document.getElementById('at-detected-note');
+        const hzEl = document.getElementById('at-detected-hz');
+        const centsBar = document.getElementById('at-cents-bar');
+
+        autoTuneNode.onPitch((info) => {
+          if (!info) {
+            if (noteEl) noteEl.textContent = '--';
+            if (hzEl) hzEl.textContent = '0 Hz';
+            if (centsBar) centsBar.style.width = '0%';
+            return;
+          }
+          if (noteEl) noteEl.textContent = info.targetNote;
+          if (hzEl) hzEl.textContent = `${info.detectedHz} Hz → ${info.targetHz} Hz`;
+          if (centsBar) {
+            const clampedCents = Math.max(-50, Math.min(50, info.cents));
+            const widthPct = Math.abs(clampedCents);
+            centsBar.style.left = clampedCents < 0 ? `${50 - widthPct}%` : '50%';
+            centsBar.style.width = `${widthPct}%`;
+            centsBar.style.background = Math.abs(clampedCents) < 15 ? '#10b981' : '#22d3ee';
+          }
+        });
+      }
+      return autoTuneNode;
+    };
+
+    this.safeOn('btn-open-autotune-modal', 'click', async () => {
+      await initAutoTuneNode();
+      const modal = document.getElementById('autotune-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    // Auto-Tune Scale Selector
+    const atScaleSelect = document.getElementById('at-scale-select');
+    if (atScaleSelect) {
+      atScaleSelect.addEventListener('change', async (e) => {
+        atActiveScale = e.target.value;
+        const node = await initAutoTuneNode();
+        node.setScale(atActiveScale, atActiveRoot);
+        this.showToast(`Auto-Tune Scale: ${atActiveRoot} ${e.target.options[e.target.selectedIndex].text}`, 'info');
+      });
+    }
+
+    // Auto-Tune Key Root Buttons
+    const atKeyBtns = document.querySelectorAll('.btn-at-key');
+    atKeyBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        atKeyBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        atActiveRoot = btn.dataset.key;
+        const node = await initAutoTuneNode();
+        node.setScale(atActiveScale, atActiveRoot);
+        this.showToast(`Auto-Tune Key diubah ke: ${atActiveRoot}`, 'success');
+      });
+    });
+
+    // Auto-Tune Retune Speed Slider
+    const atSpeedSlider = document.getElementById('slider-at-speed');
+    const atSpeedVal = document.getElementById('at-speed-val');
+    if (atSpeedSlider) {
+      atSpeedSlider.addEventListener('input', async (e) => {
+        const val = parseInt(e.target.value);
+        const node = await initAutoTuneNode();
+        node.setRetuneSpeed(val);
+        if (atSpeedVal) atSpeedVal.textContent = `${val} ms ${val === 0 ? '(Hard Travis/T-Pain)' : val <= 25 ? '(Pop)' : '(Natural)'}`;
+      });
+    }
+
+    // Auto-Tune Depth Slider
+    const atDepthSlider = document.getElementById('slider-at-depth');
+    const atDepthVal = document.getElementById('at-depth-val');
+    if (atDepthSlider) {
+      atDepthSlider.addEventListener('input', async (e) => {
+        const val = parseInt(e.target.value);
+        const node = await initAutoTuneNode();
+        node.setDepth(val / 100);
+        if (atDepthVal) atDepthVal.textContent = `${val}%`;
+      });
+    }
+
+    // Live Mic Monitor with Auto-Tune
+    const atMicBtn = document.getElementById('btn-toggle-at-mic');
+    if (atMicBtn) {
+      atMicBtn.addEventListener('click', async () => {
+        await this.engine.init();
+        const node = await initAutoTuneNode();
+
+        if (atMicStream) {
+          atMicStream.getTracks().forEach(t => t.stop());
+          atMicStream = null;
+          if (atMicSource) {
+            try { atMicSource.disconnect(); } catch (err) {}
+            atMicSource = null;
+          }
+          atMicBtn.textContent = '🎧 Aktifkan Live Mic Auto-Tune';
+          atMicBtn.classList.remove('btn-accent-emerald');
+          atMicBtn.classList.add('btn-accent-cyan');
+          this.showToast('Live Auto-Tune Mic dimatikan.', 'info');
+        } else {
+          try {
+            atMicStream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: false,
+                autoGainControl: false,
+                latency: 0
+              }
+            });
+            atMicSource = this.engine.ctx.createMediaStreamSource(atMicStream);
+            atMicSource.connect(node.input);
+            atMicBtn.textContent = '🟢 Auto-Tune Mic AKTIF (Live)';
+            atMicBtn.classList.remove('btn-accent-cyan');
+            atMicBtn.classList.add('btn-accent-emerald');
+            this.showToast(`Auto-Tune Mic AKTIF di nada ${atActiveRoot} ${atActiveScale}! Bernyanyilah di Mic.`, 'success');
+          } catch (err) {
+            console.error('Failed to start AT mic:', err);
+            this.showToast('Gagal akses mikrofon: ' + err.message, 'error');
+          }
+        }
+      });
+    }
+
+    // 6. Multiband Stem Isolation Studio
+    let stemCrossover = null;
+    const initStemNode = async () => {
+      await this.engine.init();
+      if (!stemCrossover) {
+        stemCrossover = AudioEffects.createStemCrossover(this.engine.ctx);
+        this.engine.masterBus.connect(stemCrossover.input);
+        stemCrossover.output.connect(this.engine.masterEQ.input);
+      }
+      return stemCrossover;
+    };
+
+    this.safeOn('btn-open-stems-modal', 'click', async () => {
+      await initStemNode();
+      const modal = document.getElementById('stems-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    // Stem Sliders
+    ['vocal', 'drums', 'bass', 'inst'].forEach(stem => {
+      const slider = document.getElementById(`slider-stem-${stem}`);
+      if (slider) {
+        slider.addEventListener('input', async (e) => {
+          const node = await initStemNode();
+          const val = parseInt(e.target.value) / 100;
+          node.setStemGain(stem, val);
+        });
+      }
+
+      const muteBtn = document.getElementById(`btn-mute-${stem}`);
+      if (muteBtn) {
+        muteBtn.addEventListener('click', async () => {
+          const node = await initStemNode();
+          const isMuted = node.toggleMute(stem);
+          muteBtn.classList.toggle('muted', isMuted);
+          muteBtn.textContent = isMuted ? 'MUTED' : 'MUTE';
+          this.showToast(`Stem ${stem.toUpperCase()}: ${isMuted ? 'Muted' : 'Unmuted'}`, isMuted ? 'warn' : 'info');
+        });
+      }
+    });
+
+    // Stem Quick Presets
+    this.safeOn('btn-preset-acapella', 'click', async () => {
+      const node = await initStemNode();
+      node.setStemGain('vocal', 1.2);
+      node.setStemGain('drums', 0.0);
+      node.setStemGain('bass', 0.0);
+      node.setStemGain('inst', 0.0);
+      ['drums', 'bass', 'inst'].forEach(s => {
+        const b = document.getElementById(`btn-mute-${s}`);
+        if (b) { b.classList.add('muted'); b.textContent = 'MUTED'; }
+      });
+      const vb = document.getElementById('btn-mute-vocal');
+      if (vb) { vb.classList.remove('muted'); vb.textContent = 'MUTE'; }
+      this.showToast('🎙️ Mode Solo Acapella Diaktifkan!', 'success');
+    });
+
+    this.safeOn('btn-preset-backing', 'click', async () => {
+      const node = await initStemNode();
+      node.setStemGain('vocal', 0.0);
+      node.setStemGain('drums', 1.0);
+      node.setStemGain('bass', 1.0);
+      node.setStemGain('inst', 1.0);
+      const vb = document.getElementById('btn-mute-vocal');
+      if (vb) { vb.classList.add('muted'); vb.textContent = 'MUTED'; }
+      ['drums', 'bass', 'inst'].forEach(s => {
+        const b = document.getElementById(`btn-mute-${s}`);
+        if (b) { b.classList.remove('muted'); b.textContent = 'MUTE'; }
+      });
+      this.showToast('🎶 Mode Instrumental Backing Diaktifkan!', 'success');
+    });
+
+    this.safeOn('btn-preset-reset-stems', 'click', async () => {
+      const node = await initStemNode();
+      ['vocal', 'drums', 'bass', 'inst'].forEach(s => {
+        node.setStemGain(s, 1.0);
+        const sl = document.getElementById(`slider-stem-${s}`);
+        if (sl) sl.value = 100;
+        const b = document.getElementById(`btn-mute-${s}`);
+        if (b) { b.classList.remove('muted'); b.textContent = 'MUTE'; }
+      });
+      this.showToast('🔄 Seluruh frekuensi stem di-reset ke normal.', 'info');
+    });
+
     // 5. OBS Studio Overlay Modal & Copy URL
     this.safeOn('btn-open-obs-modal', 'click', () => {
       const modal = document.getElementById('obs-modal');

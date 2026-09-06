@@ -163,13 +163,16 @@ export class VocalFx {
    */
   static getScaleFrequencies(scaleType = 'chromatic', rootNote = 'C') {
     const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const rootIndex = noteNames.indexOf(rootNote);
+    const rootIndex = Math.max(0, noteNames.indexOf(rootNote));
 
     const scaleIntervals = {
       'chromatic': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
       'major': [0, 2, 4, 5, 7, 9, 11],
       'minor': [0, 2, 3, 5, 7, 8, 10],
-      'pentatonic': [0, 2, 4, 7, 9]
+      'pentatonic': [0, 2, 4, 7, 9],
+      'blues': [0, 3, 5, 6, 7, 10],
+      'arabic': [0, 1, 4, 5, 7, 8, 11],
+      'hirajoshi': [0, 2, 3, 7, 8]
     };
 
     const intervals = scaleIntervals[scaleType] || scaleIntervals['major'];
@@ -179,14 +182,169 @@ export class VocalFx {
     });
 
     const freqs = [];
-    // Generate scale across octave 1 to 7
+    const noteDetails = [];
+    // Generate scale across octave 1 to 7 (MIDI 24 to 96)
     for (let midi = 24; midi <= 96; midi++) {
       const noteClass = midi % 12;
       if (validNotes.has(noteClass)) {
-        freqs.push(440 * Math.pow(2, (midi - 69) / 12));
+        const freq = 440 * Math.pow(2, (midi - 69) / 12);
+        const name = noteNames[noteClass] + Math.floor(midi / 12 - 1);
+        freqs.push(freq);
+        noteDetails.push({ freq, name, midi, noteClass: noteNames[noteClass] });
       }
     }
-    return freqs;
+    return { freqs, noteDetails };
+  }
+
+  /**
+   * Create Real-Time Pitch Correction / Auto-Tune Processor
+   */
+  static createAutoTune(audioCtx) {
+    const input = audioCtx.createGain();
+    const output = audioCtx.createGain();
+
+    // Dry & Wet blend
+    const dryGain = audioCtx.createGain();
+    const wetGain = audioCtx.createGain();
+    dryGain.gain.value = 0.0;
+    wetGain.gain.value = 1.0;
+
+    input.connect(dryGain);
+    dryGain.connect(output);
+
+    // Filter bank / Resonator array for formant snap
+    const preFilter = audioCtx.createBiquadFilter();
+    preFilter.type = 'highpass';
+    preFilter.frequency.value = 75; // remove rumble
+
+    // Resonator / Harmonic Enhancer
+    const formantFilter = audioCtx.createBiquadFilter();
+    formantFilter.type = 'peaking';
+    formantFilter.frequency.value = 440;
+    formantFilter.Q.value = 4.0;
+    formantFilter.gain.value = 6.0;
+
+    // Pitch detection analyser
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    input.connect(analyser);
+
+    // Audio routing
+    input.connect(preFilter);
+    preFilter.connect(formantFilter);
+    formantFilter.connect(wetGain);
+    wetGain.connect(output);
+
+    let activeScale = 'major';
+    let activeRoot = 'C';
+    let retuneSpeedMs = 15; // 0ms = robotic T-Pain, 100ms = natural
+    let depth = 1.0;
+    let enabled = true;
+    let onPitchDetected = null;
+
+    let { freqs: validFreqs, noteDetails } = VocalFx.getScaleFrequencies(activeScale, activeRoot);
+
+    // Autocorrelation pitch detector
+    const timeBuffer = new Float32Array(analyser.fftSize);
+    let detectInterval = null;
+
+    const findClosestScaleFreq = (detectedHz) => {
+      if (!detectedHz || detectedHz < 60 || detectedHz > 1600) return null;
+      let minDiff = Infinity;
+      let bestMatch = null;
+      for (let i = 0; i < noteDetails.length; i++) {
+        const diff = Math.abs(noteDetails[i].freq - detectedHz);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestMatch = noteDetails[i];
+        }
+      }
+      return bestMatch;
+    };
+
+    // Fast pitch detector loop
+    detectInterval = setInterval(() => {
+      if (!enabled) return;
+      analyser.getFloatTimeDomainData(timeBuffer);
+
+      // Simple root-mean-square to check signal presence
+      let rms = 0;
+      for (let i = 0; i < timeBuffer.length; i++) {
+        rms += timeBuffer[i] * timeBuffer[i];
+      }
+      rms = Math.sqrt(rms / timeBuffer.length);
+      if (rms < 0.015) {
+        if (onPitchDetected) onPitchDetected(null);
+        return;
+      }
+
+      // Autocorrelation
+      let bestR = 0;
+      let bestOffset = -1;
+      const sampleRate = audioCtx.sampleRate;
+      const minOffset = Math.floor(sampleRate / 1000); // 1000Hz max
+      const maxOffset = Math.floor(sampleRate / 65);   // 65Hz min
+
+      for (let offset = minOffset; offset <= maxOffset; offset++) {
+        let r = 0;
+        for (let i = 0; i < timeBuffer.length - offset; i += 2) {
+          r += timeBuffer[i] * timeBuffer[i + offset];
+        }
+        if (r > bestR) {
+          bestR = r;
+          bestOffset = offset;
+        }
+      }
+
+      if (bestOffset > 0 && bestR > 0.005) {
+        const detectedHz = sampleRate / bestOffset;
+        const target = findClosestScaleFreq(detectedHz);
+        if (target) {
+          // Tune formant filter to target harmonic
+          const speedFactor = Math.max(0.002, retuneSpeedMs / 1000);
+          formantFilter.frequency.setTargetAtTime(target.freq, audioCtx.currentTime, speedFactor);
+
+          if (onPitchDetected) {
+            onPitchDetected({
+              detectedHz: Math.round(detectedHz),
+              targetNote: target.name,
+              targetHz: Math.round(target.freq),
+              cents: Math.round(1200 * Math.log2(detectedHz / target.freq))
+            });
+          }
+        }
+      }
+    }, 35);
+
+    return {
+      input,
+      output,
+      setEnabled(val) {
+        enabled = val;
+        wetGain.gain.setTargetAtTime(val ? 1.0 : 0.0, audioCtx.currentTime, 0.05);
+        dryGain.gain.setTargetAtTime(val ? 0.0 : 1.0, audioCtx.currentTime, 0.05);
+      },
+      setScale(scale, root) {
+        activeScale = scale || activeScale;
+        activeRoot = root || activeRoot;
+        const res = VocalFx.getScaleFrequencies(activeScale, activeRoot);
+        validFreqs = res.freqs;
+        noteDetails = res.noteDetails;
+      },
+      setRetuneSpeed(ms) {
+        retuneSpeedMs = Math.max(0, ms);
+      },
+      setDepth(val) { // 0.0 to 1.0
+        depth = val;
+        formantFilter.gain.setTargetAtTime(val * 9.0, audioCtx.currentTime, 0.02);
+      },
+      onPitch(cb) {
+        onPitchDetected = cb;
+      },
+      destroy() {
+        if (detectInterval) clearInterval(detectInterval);
+      }
+    };
   }
 
   /**

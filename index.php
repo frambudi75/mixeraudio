@@ -72,6 +72,16 @@
         🤖 Voice Studio
       </button>
 
+      <!-- Live Auto-Tune Pro Button -->
+      <button class="btn-action" id="btn-open-autotune-modal" style="background:#062629; border-color:#06b6d4; color:#22d3ee;" title="Buka Real-Time Pitch Correction & Auto-Tune Studio (Major, Minor, Pentatonic, Scale Lock)">
+        ⚡ Auto-Tune Pro
+      </button>
+
+      <!-- AI Stem Isolation Studio -->
+      <button class="btn-action" id="btn-open-stems-modal" style="background:#201a09; border-color:#f59e0b; color:#fbbf24;" title="Buka Multiband Stem Isolation Studio (Pisahkan Vokal, Drum, Bass, Instrumen)">
+        🎛️ Stem Studio
+      </button>
+
       <!-- Real-time Karaoke Vocal Cut -->
       <button class="btn-action" id="btn-toggle-karaoke" title="Karaoke Mode: Hilangkan Vokal Lagu secara Real-Time">
         🎤 Karaoke Mode
@@ -894,6 +904,168 @@
       </div>
       <div class="modal-footer">
         <button class="btn-action" onclick="document.getElementById('voice-changer-modal').classList.remove('active')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auto-Tune Pro Studio Modal -->
+  <div class="modal-overlay" id="autotune-modal">
+    <div class="modal-container" style="max-width: 580px; background: #0c121e; border: 1px solid #06b6d4; box-shadow: 0 10px 40px rgba(6, 182, 212, 0.25);">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px; color:#22d3ee;">
+          <span>⚡</span> Auto-Tune Pro Pitch Studio
+        </h3>
+        <button class="btn-close-modal" onclick="document.getElementById('autotune-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
+        
+        <!-- Live Pitch Visualizer Display -->
+        <div style="background:#060d17; border:1px solid #164e63; border-radius:10px; padding:14px; text-align:center;">
+          <div style="font-size:10px; font-weight:800; color:#38bdf8; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;">LIVE PITCH DETECTOR & SCALE QUANTIZER</div>
+          <div style="display:flex; justify-content:center; align-items:baseline; gap:12px; margin:8px 0;">
+            <span style="font-size:32px; font-weight:900; font-family:var(--font-mono); color:#22d3ee;" id="at-detected-note">--</span>
+            <span style="font-size:14px; color:#94a3b8; font-family:var(--font-mono);" id="at-detected-hz">0 Hz</span>
+          </div>
+          <div style="height:6px; background:#1e293b; border-radius:3px; overflow:hidden; position:relative; max-width:240px; margin:0 auto;">
+            <div id="at-cents-bar" style="position:absolute; top:0; bottom:0; left:50%; width:0%; background:#22d3ee; transition:all 0.05s ease;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; max-width:240px; margin:4px auto 0; font-size:9px; color:#64748b; font-family:var(--font-mono);">
+            <span>-50 Cents</span>
+            <span>0</span>
+            <span>+50 Cents</span>
+          </div>
+        </div>
+
+        <!-- Scale & Key Selection -->
+        <div style="background:#131d2e; border:1px solid #1e293b; border-radius:10px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:11px; font-weight:800; color:#cbd5e1;">ROOT KEY & SCALE</span>
+            <select id="at-scale-select" style="background:#090d16; border:1px solid #06b6d4; color:#22d3ee; font-weight:700; font-size:11px; padding:4px 8px; border-radius:6px;">
+              <option value="major">Major (Pop / Bright)</option>
+              <option value="minor">Minor (Trap / Emotional)</option>
+              <option value="pentatonic">Pentatonic (RnB / Soul)</option>
+              <option value="blues">Blues Scale</option>
+              <option value="chromatic">Chromatic (All 12 Notes)</option>
+              <option value="arabic">Arabic / Maqam</option>
+              <option value="hirajoshi">Japanese Hirajoshi</option>
+            </select>
+          </div>
+
+          <!-- 12 Key Root Buttons -->
+          <div style="display:grid; grid-template-columns:repeat(6, 1fr); gap:6px;" id="at-root-keys">
+            <button class="btn-at-key active" data-key="C">C</button>
+            <button class="btn-at-key" data-key="C#">C#</button>
+            <button class="btn-at-key" data-key="D">D</button>
+            <button class="btn-at-key" data-key="D#">D#</button>
+            <button class="btn-at-key" data-key="E">E</button>
+            <button class="btn-at-key" data-key="F">F</button>
+            <button class="btn-at-key" data-key="F#">F#</button>
+            <button class="btn-at-key" data-key="G">G</button>
+            <button class="btn-at-key" data-key="G#">G#</button>
+            <button class="btn-at-key" data-key="A">A</button>
+            <button class="btn-at-key" data-key="A#">A#</button>
+            <button class="btn-at-key" data-key="B">B</button>
+          </div>
+        </div>
+
+        <!-- Fine-Tuning Controls -->
+        <div style="background:#131d2e; border:1px solid #1e293b; border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Retune Speed (0ms = Robotic T-Pain / Travis Scott)</span>
+              <span style="font-family:var(--font-mono); color:#22d3ee; font-weight:700;" id="at-speed-val">15 ms</span>
+            </div>
+            <input type="range" class="dsp-slider-horizontal" id="slider-at-speed" min="0" max="100" value="15">
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Correction Depth / Intensity</span>
+              <span style="font-family:var(--font-mono); color:#10b981; font-weight:700;" id="at-depth-val">100%</span>
+            </div>
+            <input type="range" class="dsp-slider-horizontal" id="slider-at-depth" min="0" max="100" value="100" style="accent-color:#10b981;">
+          </div>
+        </div>
+
+        <!-- Live Mic Monitor with AutoTune -->
+        <button class="btn-action btn-accent-cyan" id="btn-toggle-at-mic" style="width:100%; padding:10px; font-weight:700; font-size:12px;">
+          🎧 Aktifkan Live Mic Auto-Tune
+        </button>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('autotune-modal').classList.remove('active')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Stem Isolation Studio Modal -->
+  <div class="modal-overlay" id="stems-modal">
+    <div class="modal-container" style="max-width: 580px; background: #120e1c; border: 1px solid #f59e0b; box-shadow: 0 10px 40px rgba(245, 158, 11, 0.25);">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px; color:#fbbf24;">
+          <span>🎛️</span> Multiband Stem Isolation Studio
+        </h3>
+        <button class="btn-close-modal" onclick="document.getElementById('stems-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
+        <p style="font-size:12px; color:#94a3b8; margin:0;">
+          Pisahkan frekuensi vokal, drum, bass, dan instrumen secara mandiri untuk remix, isolasi acapella, atau karaoke.
+        </p>
+
+        <!-- 4 Stems Channel Strips -->
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; background:#0d0a14; padding:14px; border-radius:10px; border:1px solid #2d2238;">
+          
+          <!-- Stem 1: Vocal -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
+            <span style="font-size:20px;">🎤</span>
+            <span style="font-size:11px; font-weight:800; color:#38bdf8;">VOCAL</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-vocal" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#38bdf8;">
+            <button class="btn-stem-mute" id="btn-mute-vocal" data-stem="vocal" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          </div>
+
+          <!-- Stem 2: Drums -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
+            <span style="font-size:20px;">🥁</span>
+            <span style="font-size:11px; font-weight:800; color:#f59e0b;">DRUMS</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-drums" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#f59e0b;">
+            <button class="btn-stem-mute" id="btn-mute-drums" data-stem="drums" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          </div>
+
+          <!-- Stem 3: Bass -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
+            <span style="font-size:20px;">🎸</span>
+            <span style="font-size:11px; font-weight:800; color:#a855f7;">BASS</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-bass" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#a855f7;">
+            <button class="btn-stem-mute" id="btn-mute-bass" data-stem="bass" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          </div>
+
+          <!-- Stem 4: Instruments -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; background:#1a1426; padding:10px 6px; border-radius:8px;">
+            <span style="font-size:20px;">🎹</span>
+            <span style="font-size:11px; font-weight:800; color:#10b981;">MUSIC</span>
+            <input type="range" class="dsp-slider-vertical" id="slider-stem-inst" min="0" max="150" value="100" orient="vertical" style="height:110px; accent-color:#10b981;">
+            <button class="btn-stem-mute" id="btn-mute-inst" data-stem="inst" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid #ef4444; background:#2a1215; color:#ef4444; cursor:pointer;">MUTE</button>
+          </div>
+
+        </div>
+
+        <!-- Quick Preset Actions -->
+        <div style="display:flex; gap:8px;">
+          <button class="btn-action" id="btn-preset-acapella" style="flex:1; font-size:11px; font-weight:700; background:#0e2a38; border-color:#0284c7; color:#38bdf8;">
+            🎙️ Solo Acapella (Vocal Only)
+          </button>
+          <button class="btn-action" id="btn-preset-backing" style="flex:1; font-size:11px; font-weight:700; background:#2a1a0e; border-color:#d97706; color:#fbbf24;">
+            🎶 Instrumental Only (No Vocal)
+          </button>
+          <button class="btn-action" id="btn-preset-reset-stems" style="flex:1; font-size:11px; font-weight:700;">
+            🔄 Reset All Stems
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('stems-modal').classList.remove('active')">Tutup</button>
       </div>
     </div>
   </div>

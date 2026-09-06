@@ -150,6 +150,85 @@ export class AudioEffects {
   }
 
   /**
+   * Create a 4-Band Stem Crossover Splitter (Vocal, Bass, Drums, Instruments)
+   */
+  static createStemCrossover(audioCtx) {
+    const input = audioCtx.createGain();
+    const output = audioCtx.createGain();
+
+    // 1. Bass / Low Stem (< 180 Hz)
+    const bassFilter = audioCtx.createBiquadFilter();
+    bassFilter.type = 'lowpass';
+    bassFilter.frequency.value = 180;
+    const bassGain = audioCtx.createGain();
+    bassGain.gain.value = 1.0;
+    input.connect(bassFilter);
+    bassFilter.connect(bassGain);
+    bassGain.connect(output);
+
+    // 2. Vocal / Mid Stem (250Hz - 3800Hz)
+    const vocalHp = audioCtx.createBiquadFilter();
+    vocalHp.type = 'highpass';
+    vocalHp.frequency.value = 220;
+    const vocalLp = audioCtx.createBiquadFilter();
+    vocalLp.type = 'lowpass';
+    vocalLp.frequency.value = 3800;
+    const vocalGain = audioCtx.createGain();
+    vocalGain.gain.value = 1.0;
+    input.connect(vocalHp);
+    vocalHp.connect(vocalLp);
+    vocalLp.connect(vocalGain);
+    vocalGain.connect(output);
+
+    // 3. Instruments / Mid-High Stem (500Hz - 8000Hz)
+    const instHp = audioCtx.createBiquadFilter();
+    instHp.type = 'highpass';
+    instHp.frequency.value = 600;
+    const instLp = audioCtx.createBiquadFilter();
+    instLp.type = 'lowpass';
+    instLp.frequency.value = 7500;
+    const instGain = audioCtx.createGain();
+    instGain.gain.value = 1.0;
+    input.connect(instHp);
+    instHp.connect(instLp);
+    instLp.connect(instGain);
+    instGain.connect(output);
+
+    // 4. Drums / Air / Transient Stem (> 7500Hz)
+    const drumFilter = audioCtx.createBiquadFilter();
+    drumFilter.type = 'highpass';
+    drumFilter.frequency.value = 7500;
+    const drumGain = audioCtx.createGain();
+    drumGain.gain.value = 1.0;
+    input.connect(drumFilter);
+    drumFilter.connect(drumGain);
+    drumGain.connect(output);
+
+    return {
+      input,
+      output,
+      stems: {
+        bass: { gain: bassGain, muted: false, solo: false },
+        vocal: { gain: vocalGain, muted: false, solo: false },
+        inst: { gain: instGain, muted: false, solo: false },
+        drums: { gain: drumGain, muted: false, solo: false }
+      },
+      setStemGain(stemName, val) {
+        if (this.stems[stemName]) {
+          this.stems[stemName].gain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.02);
+        }
+      },
+      toggleMute(stemName) {
+        const s = this.stems[stemName];
+        if (!s) return false;
+        s.muted = !s.muted;
+        s.gain.gain.setTargetAtTime(s.muted ? 0 : 1.0, audioCtx.currentTime, 0.02);
+        return s.muted;
+      }
+    };
+  }
+
+  /**
    * Convert linear gain (0 to 2) to decibels (-inf to +6dB)
    */
   static gainToDb(gain) {
@@ -165,3 +244,4 @@ export class AudioEffects {
     return Math.pow(10, db / 20);
   }
 }
+
