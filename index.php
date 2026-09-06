@@ -82,6 +82,21 @@
         🎛️ Stem Studio
       </button>
 
+      <!-- Interactive Parametric EQ Graph (FabFilter Pro-Q style) -->
+      <button class="btn-action" id="btn-open-visual-eq" style="background:#0f1d2e; border-color:#38bdf8; color:#38bdf8;" title="Buka Interactive Visual Parametric EQ Graph (FabFilter Pro-Q Style)">
+        📈 Visual EQ
+      </button>
+
+      <!-- LUFS Broadcast & Streaming Loudness Meter -->
+      <button class="btn-action" id="btn-open-lufs-modal" style="background:#1a102e; border-color:#c084fc; color:#e9d5ff;" title="Buka EBU R128 & Spotify LUFS True-Peak Loudness Meter">
+        📊 LUFS Meter
+      </button>
+
+      <!-- A/B Reference Track Comparison -->
+      <button class="btn-action" id="btn-open-ab-modal" style="background:#1a2318; border-color:#22c55e; color:#4ade80;" title="Buka A/B Commercial Reference Track Comparison Hub">
+        🅰️/🅱️ Reference
+      </button>
+
       <!-- Real-time Karaoke Vocal Cut -->
       <button class="btn-action" id="btn-toggle-karaoke" title="Karaoke Mode: Hilangkan Vokal Lagu secara Real-Time">
         🎤 Karaoke Mode
@@ -1066,6 +1081,160 @@
       </div>
       <div class="modal-footer">
         <button class="btn-action" onclick="document.getElementById('stems-modal').classList.remove('active')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Parametric EQ Visual Graph Modal (FabFilter Style) -->
+  <div class="modal-overlay" id="visual-eq-modal">
+    <div class="modal-container" style="max-width: 760px; background: #080c14; border: 1px solid #38bdf8; box-shadow: 0 10px 40px rgba(56, 189, 248, 0.25);">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px; color:#38bdf8;">
+          <span>📈</span> Interactive Parametric EQ Curve
+        </h3>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <select id="eq-channel-select" style="background:#131d2e; border:1px solid #38bdf8; color:#38bdf8; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px;">
+            <option value="1">Channel 1 (VOX)</option>
+            <option value="2">Channel 2 (GTR)</option>
+            <option value="3">Channel 3 (BASS)</option>
+            <option value="4">Channel 4 (DRUMS)</option>
+          </select>
+          <button class="btn-close-modal" onclick="document.getElementById('visual-eq-modal').classList.remove('active')">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+        
+        <!-- Interactive Canvas -->
+        <div style="position:relative; width:100%; border-radius:8px; overflow:hidden; border:1px solid #1e293b; background:#000;">
+          <canvas id="interactive-eq-canvas" width="700" height="300" style="width:100%; height:300px; display:block; cursor:crosshair;"></canvas>
+        </div>
+
+        <!-- Band Info Readout & Instruction Hints -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0e1624; padding:8px 14px; border-radius:6px; border:1px solid #1e293b;">
+          <div style="font-family:var(--font-mono); font-size:11px; font-weight:700; color:#38bdf8;" id="eq-graph-readout">
+            Klik & geser node bulat (1-5) untuk mengubah Frequency & Gain. Scroll mouse untuk Q.
+          </div>
+          <div style="display:flex; gap:8px; font-size:10px;">
+            <span style="color:#ef4444;">● 1: Low Cut</span>
+            <span style="color:#f59e0b;">● 2: Low Shelf</span>
+            <span style="color:#10b981;">● 3: Mid 1</span>
+            <span style="color:#06b6d4;">● 4: Mid 2</span>
+            <span style="color:#a855f7;">● 5: High Shelf</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('visual-eq-modal').classList.remove('active')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUFS Broadcast & Streaming Loudness Meter Modal -->
+  <div class="modal-overlay" id="lufs-modal">
+    <div class="modal-container" style="max-width: 620px; background: #0c0a18; border: 1px solid #c084fc; box-shadow: 0 10px 40px rgba(192, 132, 252, 0.25);">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px; color:#c084fc;">
+          <span>📊</span> Broadcast & Streaming LUFS Loudness Hub
+        </h3>
+        <button class="btn-close-modal" onclick="document.getElementById('lufs-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
+        
+        <!-- Platform Target Selector -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#161226; padding:10px 14px; border-radius:8px; border:1px solid #2d2448;">
+          <span style="font-size:11px; font-weight:800; color:#cbd5e1;">STANDAR TARGET KENYARINGAN</span>
+          <select id="lufs-target-select" style="background:#0a0812; border:1px solid #a855f7; color:#e9d5ff; font-size:11px; font-weight:700; padding:4px 8px; border-radius:6px;">
+            <option value="-14.0">🟢 Spotify / Apple Music (-14.0 LUFS)</option>
+            <option value="-14.0">🔴 YouTube Music (-14.0 LUFS)</option>
+            <option value="-23.0">🟣 EBU R128 Broadcast TV (-23.0 LUFS)</option>
+            <option value="-9.0">🟡 Club / EDM Master (-9.0 LUFS)</option>
+            <option value="-16.0">🎙️ Apple Podcasts (-16.0 LUFS)</option>
+          </select>
+        </div>
+
+        <!-- Big LUFS Meters Grid -->
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+          
+          <!-- Integrated LUFS -->
+          <div style="background:#130e22; border:1px solid #3b2d56; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; font-weight:800; color:#a855f7; margin-bottom:6px;">INTEGRATED LUFS</div>
+            <div style="font-size:28px; font-weight:900; font-family:var(--font-mono); color:#e9d5ff;" id="meter-lufs-int">-70.0</div>
+            <div style="font-size:10px; margin-top:4px; font-weight:700;" id="meter-lufs-diff">Target: -14.0</div>
+          </div>
+
+          <!-- Short-Term LUFS (3s) -->
+          <div style="background:#130e22; border:1px solid #3b2d56; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; font-weight:800; color:#38bdf8; margin-bottom:6px;">SHORT-TERM (3s)</div>
+            <div style="font-size:28px; font-weight:900; font-family:var(--font-mono); color:#38bdf8;" id="meter-lufs-st">-70.0</div>
+            <div style="font-size:10px; color:#64748b; margin-top:4px;">Window 3 Detik</div>
+          </div>
+
+          <!-- Max True Peak (dBTP) -->
+          <div style="background:#130e22; border:1px solid #3b2d56; border-radius:10px; padding:14px; text-align:center;">
+            <div style="font-size:10px; font-weight:800; color:#f59e0b; margin-bottom:6px;">TRUE-PEAK MAX</div>
+            <div style="font-size:28px; font-weight:900; font-family:var(--font-mono); color:#fbbf24;" id="meter-lufs-tp">-70.0</div>
+            <div style="font-size:10px; margin-top:4px; font-weight:700; color:#10b981;" id="meter-clip-badge">SAFE (No Clip)</div>
+          </div>
+
+        </div>
+
+        <div style="display:flex; justify-content:center;">
+          <button class="btn-action" id="btn-reset-lufs" style="font-size:11px; padding:6px 16px;">
+            🔄 Reset Akumulasi Metering
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('lufs-modal').classList.remove('active')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- A/B Reference Track Comparison Modal -->
+  <div class="modal-overlay" id="ab-reference-modal">
+    <div class="modal-container" style="max-width: 600px; background: #0c1410; border: 1px solid #22c55e; box-shadow: 0 10px 40px rgba(34, 197, 94, 0.25);">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px; color:#4ade80;">
+          <span>🅰️/🅱️</span> Commercial Reference Track Hub
+        </h3>
+        <button class="btn-close-modal" onclick="document.getElementById('ab-reference-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:16px;">
+        <p style="font-size:12px; color:#94a3b8; margin:0;">
+          Bandingkan hasil mixing Anda (Track A) dengan lagu hit komersial (Track B) secara instan dengan loudness auto-matching.
+        </p>
+
+        <!-- Big A/B Toggle Button -->
+        <div style="display:flex; gap:10px;">
+          <button class="btn-action active" id="btn-mode-a" style="flex:1; padding:16px; font-size:14px; font-weight:900; background:#064e3b; border-color:#10b981; color:#34d399;">
+            🎛️ TRACK A (Live Mix)
+          </button>
+          <button class="btn-action" id="btn-mode-b" style="flex:1; padding:16px; font-size:14px; font-weight:900; background:#141e17; border-color:#2e4433; color:#6b7280;">
+            🎵 TRACK B (Reference)
+          </button>
+        </div>
+
+        <!-- Load Reference File -->
+        <div style="background:#131e16; border:1px solid #223c28; border-radius:8px; padding:14px;">
+          <div style="font-size:11px; font-weight:800; color:#4ade80; margin-bottom:8px;">IMPORT LAGU REFERENSI (MP3 / WAV)</div>
+          <input type="file" id="ref-file-input" accept="audio/*" style="font-size:11px; color:#94a3b8; width:100%;">
+          <div style="font-size:10px; color:#64748b; margin-top:6px;" id="ref-track-name">Belum ada file referensi dimuat.</div>
+        </div>
+
+        <!-- Auto Gain Match Slider -->
+        <div style="background:#131e16; border:1px solid #223c28; border-radius:8px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px;">
+            <span>Auto Loudness Matching Offset</span>
+            <span style="font-family:var(--font-mono); color:#4ade80; font-weight:700;" id="ref-gain-match-val">0.0 dB</span>
+          </div>
+          <input type="range" class="dsp-slider-horizontal" id="slider-ref-gain" min="-12" max="12" value="0" step="0.5" style="accent-color:#22c55e;">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('ab-reference-modal').classList.remove('active')">Tutup</button>
       </div>
     </div>
   </div>

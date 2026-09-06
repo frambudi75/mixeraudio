@@ -99,7 +99,21 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - Widget khusus browser source OBS Studio tanpa background transparan.
 - Sinkronisasi telemetri 60FPS real-time (FFT Spectrum Canvas, Dual VU Meters, Timecode, Active DSP Preset) via `BroadcastChannel API`.
 
-#### 📲 F. Progressive Web App (PWA)
+#### 📈 F. Interactive Parametric EQ Graph (FabFilter Pro-Q Style)
+- Tampilan kurva respons frekuensi visual interaktif dengan kanvas FFT Spectrum real-time (20Hz – 20.000Hz).
+- 5 Node Point Interaktif yang bisa di-drag: *Low Cut, Low Shelf, Mid Bell 1, Mid Bell 2, High Shelf*.
+- Kendali Q-Factor dinamis menggunakan Scroll Wheel mouse dan sinkronisasi 2 arah dengan knob mixer channel.
+
+#### 📊 G. Broadcast & Streaming LUFS Loudness Meter (ITU-R BS.1770 / EBU R128)
+- K-Weighted Pre-filtering (Stage 1 High-Shelf + Stage 2 High-Pass).
+- Pengukuran: `Integrated LUFS`, `Short-Term LUFS (3s)`, `Momentary LUFS (400ms)`, dan `Max True-Peak (dBTP)`.
+- Platform Target Compliance: Spotify (`-14.0 LUFS`), YouTube Music (`-14.0 LUFS`), EBU R128 TV (`-23.0 LUFS`), Club/EDM Master (`-9.0 LUFS`), Apple Podcasts (`-16.0 LUFS`).
+
+#### 🅰️/🅱️ H. Commercial A/B Reference Track Hub
+- Pemuatan file audio referensi komersial (WAV/MP3) untuk perbandingan langsung dengan track mixdown live.
+- Seamless zero-latency instant crossfade toggle dengan algoritma **Auto Gain Matching** untuk meniadakan bias kenyaringan (*loudness bias*).
+
+#### 📲 I. Progressive Web App (PWA)
 - Beroperasi sebagai software aplikasi desktop/mobile mandiri (Standalone Window) tanpa browser bar.
 - Caching aset via Service Worker (`sw.js`) dan konfigurasi PWA (`manifest.json`).
 

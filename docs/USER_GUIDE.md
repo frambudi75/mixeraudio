@@ -81,7 +81,39 @@
 
 ---
 
-## 7. OBS Studio Transparent Streaming Overlay (`overlay.php`)
+## 7. Interactive Parametric EQ Graph (`📈 Visual EQ`)
+1. Klik tombol **`📈 Visual EQ`** di bar atas.
+2. Pilih channel yang ingin diatur pada dropdown (misal: *Channel 1 VOX* atau *Channel 4 DRUMS*).
+3. **Mengatur Kurva EQ**:
+   - **Klik & Drag Bulatan 1-5**: Geser horizontal untuk frekuensi (Hz), geser vertikal untuk gain (+/-15dB).
+   - **Scroll Wheel Mouse**: Putar scroll mouse di atas node untuk memperlebar / mempersempit kurva Q-Factor.
+   - Perubahan di kanvas otomatis tersinkronisasi langsung ke knob channel mixer!
+
+---
+
+## 8. Broadcast & Streaming LUFS Loudness Meter (`📊 LUFS Meter`)
+1. Klik tombol **`📊 LUFS Meter`** di bar atas.
+2. **Pilih Standar Target Platform**:
+   - Spotify / Apple Music (`-14.0 LUFS`)
+   - YouTube Music (`-14.0 LUFS`)
+   - Broadcast TV EBU R128 (`-23.0 LUFS`)
+   - Club / EDM Master (`-9.0 LUFS`)
+3. Perhatikan indikator:
+   - **INTEGRATED LUFS**: Rata-rata kenyaringan keseluruhan lagu.
+   - **SHORT-TERM (3s)**: Kenyaringan dinamis 3 detik terakhir.
+   - **TRUE-PEAK MAX (dBTP)**: Memastikan tidak ada distorsi inter-sample (*SAFE / CLIPPING*).
+
+---
+
+## 9. Commercial A/B Reference Track Hub (`🅰️/🅱️ Reference`)
+1. Klik tombol **`🅰️/🅱️ Reference`** di bar atas.
+2. Klik **"Choose File"** untuk mengimpor lagu komersial berkualitas tinggi (MP3/WAV).
+3. Klik tombol **`🎵 TRACK B (Reference)`** untuk mendengar lagu acuan, atau **`🎛️ TRACK A (Live Mix)`** untuk kembali ke mixdown Anda.
+4. Sistem otomatis melakukan **Auto Gain Matching** agar perbandingan terdengar seimbang dan objektif tanpa bias volume.
+
+---
+
+## 10. OBS Studio Transparent Streaming Overlay (`overlay.php`)
 1. Klik tombol **`📺 OBS Overlay`** di header.
 2. Klik tombol **"Copy URL"**.
 3. Buka OBS Studio di komputer Anda:
@@ -92,7 +124,7 @@
 
 ---
 
-## 8. Audio I/O Routing (Input Aplikasi & Output Jack)
+## 11. Audio I/O Routing (Input Aplikasi & Output Jack)
 1. Klik tombol **"I/O Routing"** di header.
 2. **Pilih Output Jack Fisik**:
    - Pilih dropdown *Master Audio Output Jack* untuk mengarahkan suara ke Headphone, Speaker USB, atau Line Out tertentu.

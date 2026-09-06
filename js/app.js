@@ -2,17 +2,20 @@
  * StudioMaster Pro - Main Application Controller
  */
 
-import { AudioEngine } from './audio-engine.js?v=3.0.4';
-import { AudioVisualizer } from './audio-visualizer.js?v=3.0.4';
-import { AudioRecorder } from './audio-recorder.js?v=3.0.4';
-import { SynthDemo } from './synth-demo.js?v=3.0.4';
-import { SamplePads } from './sample-pads.js?v=3.0.4';
-import { MidiController } from './midi-controller.js?v=3.0.4';
-import { AudioEffects } from './audio-effects.js?v=3.0.4';
-import { AudioRouting } from './audio-routing.js?v=3.0.4';
-import { DspSuite } from './dsp-suite.js?v=3.0.4';
-import { AutoDucking } from './auto-ducking.js?v=3.0.4';
-import { VocalFx } from './vocal-fx.js?v=3.0.4';
+import { AudioEngine } from './audio-engine.js?v=3.1.0';
+import { AudioVisualizer } from './audio-visualizer.js?v=3.1.0';
+import { AudioRecorder } from './audio-recorder.js?v=3.1.0';
+import { SynthDemo } from './synth-demo.js?v=3.1.0';
+import { SamplePads } from './sample-pads.js?v=3.1.0';
+import { MidiController } from './midi-controller.js?v=3.1.0';
+import { AudioEffects } from './audio-effects.js?v=3.1.0';
+import { AudioRouting } from './audio-routing.js?v=3.1.0';
+import { DspSuite } from './dsp-suite.js?v=3.1.0';
+import { AutoDucking } from './auto-ducking.js?v=3.1.0';
+import { VocalFx } from './vocal-fx.js?v=3.1.0';
+import { InteractiveEQ } from './interactive-eq.js?v=3.1.0';
+import { LoudnessMeter } from './loudness-meter.js?v=3.1.0';
+import { ReferenceTrack } from './reference-track.js?v=3.1.0';
 
 class StudioApp {
   constructor() {
@@ -24,6 +27,9 @@ class StudioApp {
     this.routing = new AudioRouting(this.engine, this);
     this.dspSuite = new DspSuite(this.engine, this);
     this.autoDucking = new AutoDucking(this.engine, this);
+    this.loudnessMeter = null;
+    this.referenceTrack = null;
+    this.interactiveEQ = null;
 
     this.selectedChannelId = 1;
     this.channelsContainer = null;
@@ -581,7 +587,191 @@ class StudioApp {
       this.showToast('🔄 Seluruh frekuensi stem di-reset ke normal.', 'info');
     });
 
-    // 5. OBS Studio Overlay Modal & Copy URL
+    // 7. Interactive Visual Parametric EQ Graph (FabFilter Pro-Q Style)
+    const initVisualEQ = async () => {
+      await this.engine.init();
+      if (!this.interactiveEQ) {
+        const canvas = document.getElementById('interactive-eq-canvas');
+        if (canvas) {
+          this.interactiveEQ = new InteractiveEQ(canvas, this.engine, this);
+        }
+      }
+      const chId = parseInt(document.getElementById('eq-channel-select')?.value) || this.selectedChannelId;
+      const targetCh = this.engine.channels.find(c => c.id === chId) || this.engine.channels[0];
+      if (this.interactiveEQ && targetCh) {
+        this.interactiveEQ.setChannel(targetCh);
+      }
+    };
+
+    this.safeOn('btn-open-visual-eq', 'click', async () => {
+      await initVisualEQ();
+      const modal = document.getElementById('visual-eq-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    const eqChSelect = document.getElementById('eq-channel-select');
+    if (eqChSelect) {
+      eqChSelect.addEventListener('change', (e) => {
+        const chId = parseInt(e.target.value);
+        const ch = this.engine.channels.find(c => c.id === chId);
+        if (this.interactiveEQ && ch) {
+          this.interactiveEQ.setChannel(ch);
+          this.showToast(`Visual EQ terhubung ke: ${ch.name}`, 'info');
+        }
+      });
+    }
+
+    // 8. EBU R128 & Spotify LUFS Loudness Meter
+    const initLoudnessMeter = async () => {
+      await this.engine.init();
+      if (!this.loudnessMeter) {
+        this.loudnessMeter = new LoudnessMeter(this.engine.ctx, this.engine.masterBus);
+        
+        const intEl = document.getElementById('meter-lufs-int');
+        const stEl = document.getElementById('meter-lufs-st');
+        const tpEl = document.getElementById('meter-lufs-tp');
+        const diffEl = document.getElementById('meter-lufs-diff');
+        const clipEl = document.getElementById('meter-clip-badge');
+
+        this.loudnessMeter.start((data) => {
+          if (intEl) intEl.textContent = data.integrated > -65 ? `${data.integrated.toFixed(1)} LUFS` : '-INF';
+          if (stEl) stEl.textContent = data.shortTerm > -65 ? `${data.shortTerm.toFixed(1)} LUFS` : '-INF';
+          if (tpEl) tpEl.textContent = data.truePeak > -65 ? `${data.maxTruePeak.toFixed(1)} dBTP` : '-INF';
+          
+          if (diffEl) {
+            const diff = data.integrated - data.target;
+            const sign = diff > 0 ? '+' : '';
+            diffEl.textContent = `${sign}${diff.toFixed(1)} LU dari target (${data.target} LUFS)`;
+            diffEl.style.color = Math.abs(diff) <= 1.0 ? '#10b981' : diff > 0 ? '#ef4444' : '#38bdf8';
+          }
+
+          if (clipEl) {
+            if (data.isClipping) {
+              clipEl.textContent = '⚠️ CLIPPING DETECTED';
+              clipEl.style.color = '#ef4444';
+            } else {
+              clipEl.textContent = 'SAFE (No Clip)';
+              clipEl.style.color = '#10b981';
+            }
+          }
+        });
+      }
+    };
+
+    this.safeOn('btn-open-lufs-modal', 'click', async () => {
+      await initLoudnessMeter();
+      const modal = document.getElementById('lufs-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    const lufsTargetSelect = document.getElementById('lufs-target-select');
+    if (lufsTargetSelect) {
+      lufsTargetSelect.addEventListener('change', (e) => {
+        const val = parseFloat(e.target.value);
+        if (this.loudnessMeter) {
+          this.loudnessMeter.setTarget(val);
+          this.showToast(`Standar Loudness diubah ke: ${e.target.options[e.target.selectedIndex].text}`, 'info');
+        }
+      });
+    }
+
+    this.safeOn('btn-reset-lufs', 'click', () => {
+      if (this.loudnessMeter) {
+        this.loudnessMeter.reset();
+        this.showToast('Meter akumulasi LUFS di-reset.', 'info');
+      }
+    });
+
+    // 9. Commercial A/B Reference Track Comparison
+    const initReferenceTrack = async () => {
+      await this.engine.init();
+      if (!this.referenceTrack) {
+        this.referenceTrack = new ReferenceTrack(this.engine, this);
+      }
+      return this.referenceTrack;
+    };
+
+    this.safeOn('btn-open-ab-modal', 'click', async () => {
+      await initReferenceTrack();
+      const modal = document.getElementById('ab-reference-modal');
+      if (modal) modal.classList.add('active');
+    });
+
+    const refFileInput = document.getElementById('ref-file-input');
+    const refTrackName = document.getElementById('ref-track-name');
+    const refGainVal = document.getElementById('ref-gain-match-val');
+    const sliderRefGain = document.getElementById('slider-ref-gain');
+
+    if (refFileInput) {
+      refFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const ref = await initReferenceTrack();
+        this.showToast(`Mendekode file referensi "${file.name}"...`, 'info');
+        await ref.loadReferenceFile(file);
+        if (refTrackName) refTrackName.textContent = `File aktif: ${file.name} (Loudness match: ${ref.gainMatchDb > 0 ? '+' : ''}${ref.gainMatchDb.toFixed(1)} dB)`;
+        if (sliderRefGain) sliderRefGain.value = ref.gainMatchDb;
+        if (refGainVal) refGainVal.textContent = `${ref.gainMatchDb > 0 ? '+' : ''}${ref.gainMatchDb.toFixed(1)} dB`;
+        this.showToast(`Lagu referensi siap! Klik Track B untuk mendengarkan.`, 'success');
+      });
+    }
+
+    const btnModeA = document.getElementById('btn-mode-a');
+    const btnModeB = document.getElementById('btn-mode-b');
+
+    const updateABButtons = (mode) => {
+      if (btnModeA && btnModeB) {
+        if (mode === 'A') {
+          btnModeA.style.background = '#064e3b';
+          btnModeA.style.borderColor = '#10b981';
+          btnModeA.style.color = '#34d399';
+          btnModeB.style.background = '#141e17';
+          btnModeB.style.borderColor = '#2e4433';
+          btnModeB.style.color = '#6b7280';
+        } else {
+          btnModeB.style.background = '#064e3b';
+          btnModeB.style.borderColor = '#10b981';
+          btnModeB.style.color = '#34d399';
+          btnModeA.style.background = '#141e17';
+          btnModeA.style.borderColor = '#2e4433';
+          btnModeA.style.color = '#6b7280';
+        }
+      }
+    };
+
+    if (btnModeA) {
+      btnModeA.addEventListener('click', async () => {
+        const ref = await initReferenceTrack();
+        if (ref.activeMode === 'B') {
+          ref.toggleAB();
+          updateABButtons('A');
+        }
+      });
+    }
+
+    if (btnModeB) {
+      btnModeB.addEventListener('click', async () => {
+        const ref = await initReferenceTrack();
+        if (ref.activeMode === 'A') {
+          ref.toggleAB();
+          updateABButtons('B');
+        }
+      });
+    }
+
+    if (sliderRefGain) {
+      sliderRefGain.addEventListener('input', async (e) => {
+        const ref = await initReferenceTrack();
+        const val = parseFloat(e.target.value);
+        ref.gainMatchDb = val;
+        if (refGainVal) refGainVal.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)} dB`;
+        if (ref.isPlaying) {
+          ref.playRefTrack();
+        }
+      });
+    }
+
+    // 10. OBS Studio Overlay Modal & Copy URL
     this.safeOn('btn-open-obs-modal', 'click', () => {
       const modal = document.getElementById('obs-modal');
       const input = document.getElementById('obs-url-input');

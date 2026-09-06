@@ -3,7 +3,7 @@
  * Enables PWA installability and fast asset caching
  */
 
-const CACHE_NAME = 'studiomaster-v3.1.0';
+const CACHE_NAME = 'studiomaster-v3.2.0';
 const ASSETS_TO_CACHE = [
   './',
   'index.php',
@@ -24,7 +24,10 @@ const ASSETS_TO_CACHE = [
   'js/vocal-fx.js',
   'js/sample-pads.js',
   'js/synth-demo.js',
-  'js/midi-controller.js'
+  'js/midi-controller.js',
+  'js/interactive-eq.js',
+  'js/loudness-meter.js',
+  'js/reference-track.js'
 ];
 
 self.addEventListener('install', (e) => {

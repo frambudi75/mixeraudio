@@ -33,7 +33,21 @@
 - **Parametric Sliders**: Pitch Shift (-12 s/d +12 ST), Tube Drive Saturation, dan Wet/Dry Blend.
 - **Headphone Loopback Monitor**: Mendengar suara mic termodulasi dengan latensi mendekati 0ms.
 
-### 🎙️ 4. 16-Pad Custom Soundboard & Launchpad Sampler
+### 📈 4. Interactive Parametric EQ Graph (FabFilter Pro-Q Style)
+- **Visual Frequency Response Curve**: Kanvas kurva respons EQ 20Hz – 20kHz dengan overlay FFT spectrum real-time.
+- **5 Draggable Filter Nodes**: Low Cut, Low Shelf, Mid Bell 1, Mid Bell 2, dan High Shelf dengan Q-Factor scroll wheel mouse.
+- **Bi-Directional Sync**: Otomatis tersinkronisasi dengan knob analog pada strip mixer channel.
+
+### 📊 5. Broadcast & Streaming LUFS Loudness Meter
+- **Standar Industri ITU-R BS.1770 / EBU R128**: Dilengkapi K-Weighting filter (Stage 1 High-Shelf + Stage 2 High-Pass).
+- **Pengukuran Presisi**: Integrated LUFS, Short-Term LUFS (3s), Momentary LUFS (400ms), dan True-Peak Max (dBTP) clip detector.
+- **Target Presets**: Spotify / Apple Music (`-14.0 LUFS`), YouTube (`-14.0 LUFS`), EBU R128 TV (`-23.0 LUFS`), Club/EDM Master (`-9.0 LUFS`).
+
+### 🅰️/🅱️ 6. Commercial A/B Reference Track Hub
+- **Instant A/B Comparison**: Membandingkan hasil mixing Anda (Track A) dengan lagu hit komersial (Track B) secara instan.
+- **Auto Loudness Matching**: Mengeliminasi bias kenyaringan volume dengan gain offset otomatis.
+
+### 🎙️ 7. 16-Pad Custom Soundboard & Launchpad Sampler
 - **Direct Mic Sampling**: Merekam cuplikan vokal/jingle 2 detik langsung dari mic ke memori pad.
 - **Custom Sample Import**: Drag & Drop file audio (MP3/WAV) langsung ke pad mana pun.
 - **Shortcut Grid Keyboard**: `1-4`, `Q-R`, `A-F`, `Z-V`.
