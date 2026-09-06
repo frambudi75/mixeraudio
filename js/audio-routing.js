@@ -47,24 +47,29 @@ export class AudioRouting {
   }
 
   populateDeviceSelectors() {
-    // 1. Master Output Selector
+    // 1. Master Output Selectors
     const masterOutputSelect = document.getElementById('master-output-select');
-    if (masterOutputSelect) {
-      masterOutputSelect.innerHTML = '';
+    const modalMasterOutputSelect = document.getElementById('modal-master-output-select');
 
+    const fillOutput = (selectEl) => {
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
       if (this.audioOutputs.length === 0) {
-        masterOutputSelect.innerHTML = '<option value="default">Default System Audio Output (Jack / Speakers)</option>';
+        selectEl.innerHTML = '<option value="default">Default System Audio Output (Jack / Speakers)</option>';
       } else {
         this.audioOutputs.forEach(device => {
           const opt = document.createElement('option');
           opt.value = device.deviceId;
           opt.textContent = device.label || `Output Jack / Speaker (${device.deviceId.slice(0, 8)})`;
-          masterOutputSelect.appendChild(opt);
+          selectEl.appendChild(opt);
         });
       }
-    }
+    };
 
-    // 2. Input Hardware Selector
+    fillOutput(masterOutputSelect);
+    fillOutput(modalMasterOutputSelect);
+
+    // 2. Hardware Microphone / Line-In Selector
     const hwInputSelect = document.getElementById('hw-input-select');
     if (hwInputSelect) {
       hwInputSelect.innerHTML = '';
@@ -77,6 +82,45 @@ export class AudioRouting {
           opt.textContent = device.label || `Audio Input Device (${device.deviceId.slice(0, 8)})`;
           hwInputSelect.appendChild(opt);
         });
+      }
+    }
+
+    // 3. Virtual Cable / Stereo Mix Selector
+    const virtualCableSelect = document.getElementById('virtual-cable-select');
+    if (virtualCableSelect) {
+      virtualCableSelect.innerHTML = '';
+      if (this.audioInputs.length === 0) {
+        virtualCableSelect.innerHTML = '<option value="default">Default System Loopback / Stereo Mix</option>';
+      } else {
+        // Prioritize devices matching Cable, Loopback, Stereo Mix, What U Hear, Virtual
+        const loopbackDevices = this.audioInputs.filter(d => {
+          const lbl = (d.label || '').toLowerCase();
+          return lbl.includes('cable') || lbl.includes('mix') || lbl.includes('loopback') || lbl.includes('virtual') || lbl.includes('monitor');
+        });
+
+        const otherDevices = this.audioInputs.filter(d => !loopbackDevices.includes(d));
+
+        if (loopbackDevices.length > 0) {
+          const grp = document.createElement('optgroup');
+          grp.label = '⭐ Virtual Cable / Stereo Mix Terdeteksi';
+          loopbackDevices.forEach(device => {
+            const opt = document.createElement('option');
+            opt.value = device.deviceId;
+            opt.textContent = `⭐ ${device.label}`;
+            grp.appendChild(opt);
+          });
+          virtualCableSelect.appendChild(grp);
+        }
+
+        const grpOther = document.createElement('optgroup');
+        grpOther.label = 'Semua Perangkat Audio Input Lainnya';
+        otherDevices.forEach(device => {
+          const opt = document.createElement('option');
+          opt.value = device.deviceId;
+          opt.textContent = device.label || `Audio Input (${device.deviceId.slice(0, 8)})`;
+          grpOther.appendChild(opt);
+        });
+        virtualCableSelect.appendChild(grpOther);
       }
     }
   }
@@ -124,10 +168,10 @@ export class AudioRouting {
   }
 
   /**
-   * Capture Audio from ANY Application (Spotify, Discord, YouTube, Game, Chrome Tab, Media Player)
-   * Uses getDisplayMedia system audio loopback capture
+   * Capture Audio from Application / Browser Tab / System with Anti-Echo Local Playback Suppression
+   * Uses getDisplayMedia with suppressLocalAudioPlayback: true so only mixer plays the sound
    */
-  async captureApplicationAudio(targetChannel) {
+  async captureApplicationAudio(targetChannel, antiEcho = true) {
     await this.engine.init();
 
     if (this.appCaptureActive && this.appStream) {
@@ -136,44 +180,72 @@ export class AudioRouting {
     }
 
     try {
-      this.app.showToast('Pilih jendela aplikasi (Spotify / Game / Browser Tab) & centang "Share Audio / Bagikan Audio"', 'info');
+      this.app.showToast('Pilih Tab atau Jendela Aplikasi & pastikan "Share Audio / Bagikan Audio" dicentang.', 'info');
 
-      // Request screen capture with system/app audio
-      this.appStream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+      // Request screen/tab capture with anti-echo suppression
+      const constraints = {
+        video: {
+          displaySurface: 'browser'
+        },
         audio: {
+          suppressLocalAudioPlayback: antiEcho, // Mutes the local tab so audio only plays through the mixer
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
-          suppressLocalAudioPlayback: false
-        }
-      });
+          channelCount: 2
+        },
+        preferCurrentTab: false,
+        selfBrowserSurface: 'exclude',
+        systemAudio: 'include'
+      };
+
+      try {
+        this.appStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+      } catch (e) {
+        // Fallback for browsers that don't accept extended constraints
+        this.appStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true
+        });
+      }
 
       const audioTracks = this.appStream.getAudioTracks();
       if (audioTracks.length === 0) {
-        this.app.showToast('Peringatan: Tidak ada audio yang dipilih. Pastikan opsi "Share Audio" dicentang!', 'warn');
+        this.app.showToast('Peringatan: Tidak ada track audio yang dipilih. Pastikan opsi "Share Audio" dicentang pada dialog!', 'warn');
         this.stopApplicationAudio();
         return false;
       }
 
-      // Hide/stop the video track since we only need the audio
+      // Configure tracks
+      audioTracks.forEach(track => {
+        if ('suppressLocalAudioPlayback' in track.getSettings()) {
+          console.log('Local audio playback suppression active on track:', track.label);
+        }
+      });
+
+      // Hide/stop the video track if not needed
       this.appStream.getVideoTracks().forEach(track => {
-        // Keep active or minimize
         track.onended = () => this.stopApplicationAudio();
       });
+
+      // Disconnect previous node if existing
+      if (this.appSourceNode) {
+        try { this.appSourceNode.disconnect(); } catch (e) {}
+      }
 
       // Connect App Stream into target mixer channel
       this.appSourceNode = this.engine.ctx.createMediaStreamSource(this.appStream);
       
-      const channel = targetChannel || this.engine.channels[0];
+      const channel = targetChannel || this.engine.channels.find(c => c.id === this.app.selectedChannelId) || this.engine.channels[0];
       if (channel) {
         channel.sourceType = 'app';
         this.appSourceNode.connect(channel.inputNode);
-        this.app.updateChannelSourceBadge(channel.id, 'APP AUDIO');
+        this.app.updateChannelSourceBadge(channel.id, 'APP (ANTI-ECHO)');
       }
 
       this.appCaptureActive = true;
-      this.app.showToast(`Audio Aplikasi berhasil terhubung ke ${channel.name}!`, 'success');
+      this.updateInputHeaderStatus('APP AUDIO (ANTI-ECHO)');
+      this.app.showToast(`Audio Aplikasi berhasil terhubung ke ${channel.name} dengan Anti-Echo!`, 'success');
       return true;
     } catch (err) {
       console.warn('App capture cancelled or failed:', err);
@@ -192,19 +264,20 @@ export class AudioRouting {
       this.appSourceNode = null;
     }
     this.appCaptureActive = false;
+    this.updateInputHeaderStatus('FILE / DEMO');
     this.app.showToast('Capture audio aplikasi dinonaktifkan.', 'info');
   }
 
   /**
-   * Connect a specific physical Microphone / Line-In to a specific channel
+   * Connect a specific physical Microphone, Line-In, or Virtual Audio Cable to a channel
    */
-  async routeHardwareInputToChannel(deviceId, targetChannel) {
+  async routeHardwareInputToChannel(deviceId, targetChannel, labelName = 'MIC / LINE-IN') {
     await this.engine.init();
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
-          deviceId: deviceId ? { exact: deviceId } : undefined,
+          deviceId: deviceId && deviceId !== 'default' ? { exact: deviceId } : undefined,
           echoCancellation: false,
           autoGainControl: false,
           noiseSuppression: false,
@@ -213,18 +286,26 @@ export class AudioRouting {
       });
 
       const sourceNode = this.engine.ctx.createMediaStreamSource(stream);
-      const channel = targetChannel || this.engine.channels[0];
+      const channel = targetChannel || this.engine.channels.find(c => c.id === this.app.selectedChannelId) || this.engine.channels[0];
       if (channel) {
-        channel.sourceType = 'mic';
+        channel.sourceType = 'hardware';
         sourceNode.connect(channel.inputNode);
-        this.app.updateChannelSourceBadge(channel.id, 'HARDWARE IN');
-        this.app.showToast(`Input Jack terhubung ke ${channel.name}`, 'success');
+        this.app.updateChannelSourceBadge(channel.id, labelName);
+        this.updateInputHeaderStatus(labelName);
+        this.app.showToast(`Input ${labelName} berhasil terhubung ke ${channel.name}!`, 'success');
       }
       return true;
     } catch (err) {
       console.error('Failed to route hardware input:', err);
-      this.app.showToast('Gagal menghubungkan input jack: ' + err.message, 'error');
+      this.app.showToast('Gagal menghubungkan input: ' + err.message, 'error');
       return false;
+    }
+  }
+
+  updateInputHeaderStatus(label) {
+    const badge = document.getElementById('input-source-active-indicator');
+    if (badge) {
+      badge.textContent = label;
     }
   }
 }

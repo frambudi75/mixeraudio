@@ -115,13 +115,13 @@
         </div>
       </div>
       <div class="top-bar-right">
-        <!-- Quick App Audio Capture Trigger -->
-        <button class="btn-action btn-accent-emerald" id="btn-quick-app-capture" style="height:28px; font-size:11px;" title="Hubungkan audio dari aplikasi apa saja (Spotify, YouTube, Game, Discord)">
+        <!-- Input Mix Hub & Anti-Echo Trigger -->
+        <button class="btn-action btn-accent-emerald" id="btn-open-input-mix-hub" style="height:28px; font-size:11px;" title="Pilihan Input Mix: Tangkap Audio Aplikasi (Spotify/Game/YT) dengan Anti-Echo, Mic, atau Virtual Cable Loopback">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          Input dari Aplikasi (Spotify/Game/YT)
+          🎛️ Pilihan Input Mix & Anti-Echo
         </button>
         <span style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">
-          DSP ENGINE: <b style="color:var(--accent-emerald);">64-BIT FLOAT REALTIME</b> | DUCKING: <b id="ducking-indicator" style="color:#ef4444;">OFF</b> | HOTKEYS: <b style="color:var(--accent-gold);">ACTIVE</b>
+          INPUT: <b id="input-source-active-indicator" style="color:var(--accent-cyan);">FILE / DEMO</b> | DSP ENGINE: <b style="color:var(--accent-emerald);">64-BIT FLOAT</b> | DUCKING: <b id="ducking-indicator" style="color:#ef4444;">OFF</b> | HOTKEYS: <b style="color:var(--accent-gold);">ACTIVE</b>
         </span>
       </div>
     </div>
@@ -513,45 +513,98 @@
   </div>
 
   <!-- ==========================================================================
-       MODAL 2: Audio I/O Routing Manager
+       MODAL 2: Input Mix Hub & Audio I/O Routing Manager
        ========================================================================== -->
   <div class="modal-overlay" id="routing-modal">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 680px;">
       <div class="modal-header">
-        <h3>Routing I/O Audio & Jack Perangkat</h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🎛️</span>
+          <div>
+            <h3 style="margin:0; font-size:15px; color:#fff;">Pusat Input Mix Audio & Anti-Echo</h3>
+            <p style="margin:0; font-size:11px; color:#94a3b8;">Pilih sumber suara masuk, atur eliminasi echo suara ganda, dan rute output speaker/jack.</p>
+          </div>
+        </div>
         <button class="modal-close" id="btn-close-routing">&times;</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; max-height:75vh; overflow-y:auto;">
         
-        <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #252f3f;">
-          <h4 style="font-size:13px; color:#f87171; margin-bottom:6px;">🔊 Master Audio Output Jack (Speaker / Headphone / DAC)</h4>
-          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Pilih ke jack audio fisik mana suara mixer akan dikeluarkan:</p>
-          <select id="modal-master-output-select" style="width:100%; background:#090d14; border:1px solid #3b485d; color:#fff; padding:8px 12px; border-radius:6px; font-size:12px;">
-            <option value="default">Default System Audio Output</option>
-          </select>
+        <!-- Target Channel Info -->
+        <div style="background:rgba(56, 189, 248, 0.08); border:1px solid rgba(56, 189, 248, 0.25); padding:10px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:12px; color:#e0f2fe;">Target Channel Mixer: <b id="routing-target-channel-name" style="color:var(--accent-cyan);">CH 1</b></span>
+          <span style="font-size:11px; background:#0369a1; color:#fff; padding:2px 8px; border-radius:4px; font-weight:700;">ACTIVE STRIP</span>
         </div>
 
+        <!-- Option 1: App / Tab Audio with Anti-Echo Suppression -->
+        <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #10b981; position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <h4 style="font-size:13px; color:#10b981; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>🌐</span> OPSI 1: Tangkap Audio Aplikasi / Tab Browser (Spotify/Game/YT)
+            </h4>
+            <span style="font-size:10px; background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; padding:2px 6px; border-radius:4px; font-weight:700;">ANTI-ECHO FILTER</span>
+          </div>
+          <p style="font-size:11px; color:#94a3b8; line-height:1.4; margin-bottom:10px;">
+            Mengarahkan suara dari tab browser atau jendela aplikasi ke dalam mixer. Fitur <b>Anti-Echo Suppression</b> otomatis menonaktifkan suara langsung browser, sehingga <b>100% suara hanya keluar dari mixer ini</b> tanpa gema / suara ganda!
+          </p>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; background:#090d14; padding:8px 10px; border-radius:6px; border:1px solid #233044;">
+            <input type="checkbox" id="chk-anti-echo" checked style="accent-color:#10b981; cursor:pointer;">
+            <label for="chk-anti-echo" style="font-size:11px; color:#e2e8f0; cursor:pointer; font-weight:600;">
+              🛡️ Aktifkan Anti-Echo (Mute Pemutaran Lokal Browser Asli)
+            </label>
+          </div>
+          <button class="btn-action btn-accent-emerald" id="btn-modal-capture-app" style="width:100%; justify-content:center; padding:9px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            🚀 Pilih Jendela/Tab & Mulai Tangkap Audio (Anti-Echo)
+          </button>
+        </div>
+
+        <!-- Option 2: Hardware Microphone / Line In -->
         <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #252f3f;">
-          <h4 style="font-size:13px; color:#06b6d4; margin-bottom:6px;">🎙️ Hardware Microphone / Line In Input Jack</h4>
-          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Pilih mikrofon atau audio interface fisik untuk channel mixer:</p>
+          <h4 style="font-size:13px; color:#06b6d4; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+            <span>🎙️</span> OPSI 2: Mikrofon Fisik / Line-In Soundcard
+          </h4>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Pilih mikrofon eksternal, headset jack, atau input audio interface (Direct Hardware):</p>
           <select id="hw-input-select" style="width:100%; background:#090d14; border:1px solid #3b485d; color:#fff; padding:8px 12px; border-radius:6px; font-size:12px;">
             <option value="default">Default Microphone / Line In</option>
           </select>
-          <button class="btn-action btn-accent-blue" id="btn-route-hw-input" style="margin-top:10px; width:100%; justify-content:center;">Hubungkan Input Fisik ke Channel Terpilih</button>
+          <button class="btn-action btn-accent-blue" id="btn-route-hw-input" style="margin-top:10px; width:100%; justify-content:center; padding:8px;">
+            🎙️ Hubungkan Mic/Line-In ke Channel
+          </button>
         </div>
 
-        <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #252f3f;">
-          <h4 style="font-size:13px; color:#10b981; margin-bottom:6px;">💻 Tangkap Audio Aplikasi (Spotify, Discord, Game, Browser)</h4>
-          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Mengalirkan audio internal langsung dari aplikasi apa saja ke dalam mixer secara real-time:</p>
-          <button class="btn-action btn-accent-emerald" id="btn-modal-capture-app" style="width:100%; justify-content:center;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            Pilih Jendela Aplikasi & Mulai Tangkap Audio
+        <!-- Option 3: Virtual Audio Cable / Stereo Mix Loopback -->
+        <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #8b5cf6;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <h4 style="font-size:13px; color:#c084fc; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>🎛️</span> OPSI 3: Virtual Audio Cable / Stereo Mix (Semua Suara Windows/Linux)
+            </h4>
+            <span style="font-size:10px; background:rgba(139,92,246,0.2); color:#c084fc; border:1px solid #8b5cf6; padding:2px 6px; border-radius:4px; font-weight:700;">NO POPUP</span>
+          </div>
+          <p style="font-size:11px; color:#94a3b8; line-height:1.4; margin-bottom:10px;">
+            Ingin <b>SEMUA suara laptop/PC</b> (Game, Spotify Desktop, Discord, VLC) otomatis masuk ke mixer tanpa pop-up layar? Gunakan driver loopback gratis seperti <i>VB-Audio Cable</i> atau <i>Stereo Mix</i> Windows/PulseAudio.
+          </p>
+          <select id="virtual-cable-select" style="width:100%; background:#090d14; border:1px solid #3b485d; color:#fff; padding:8px 12px; border-radius:6px; font-size:12px;">
+            <option value="default">Scan Otomatis Device Virtual Cable / Loopback...</option>
+          </select>
+          <button class="btn-action btn-accent-purple" id="btn-route-virtual-cable" style="margin-top:10px; width:100%; justify-content:center; padding:8px;">
+            🎛️ Aktifkan Virtual Cable Loopback
           </button>
+        </div>
+
+        <!-- Section: Master Output Jack -->
+        <div style="background:#131822; padding:14px; border-radius:8px; border:1px solid #ef4444;">
+          <h4 style="font-size:13px; color:#f87171; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+            <span>🔊</span> Master Audio Output Jack (Speaker / Headphone / DAC)
+          </h4>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Pilih ke jack audio fisik mana suara hasil filter mixer akan dikeluarkan:</p>
+          <select id="modal-master-output-select" style="width:100%; background:#090d14; border:1px solid #3b485d; color:#fff; padding:8px 12px; border-radius:6px; font-size:12px;">
+            <option value="default">Default System Audio Output (Jack / Speakers)</option>
+          </select>
         </div>
 
       </div>
       <div class="modal-footer">
-        <button class="btn-action" id="btn-refresh-devices">Scan Ulang Perangkat Jack</button>
+        <button class="btn-action" id="btn-refresh-devices">🔄 Refresh Daftar Device</button>
         <button class="btn-action btn-accent-blue" onclick="document.getElementById('routing-modal').classList.remove('active')">Selesai</button>
       </div>
     </div>

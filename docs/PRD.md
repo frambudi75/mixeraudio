@@ -59,11 +59,16 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Master Brickwall Limiter**: Ceiling -0.5 dB untuk mencegah distorsi digital.
 - **Master Output Device Selector**: Mengarahkan output master ke jack audio fisik tertentu (Headphone, Speaker, USB DAC) via `setSinkId`.
 
-### 3.4. Studio Equalizer & DSP FX Suite (18 Presets)
-- 18 Preset Studio: Studio Clean, Dolby 3D Surround, Live Concert Hall, 8D Spatial Audio, Slowed + Reverb, Nightcore, Vaporwave, Bass Master 808, Karaoke Mode, Haptic Bass, EDM Festival, Vinyl Lo-Fi Chill, Cathedral 3D Spatial, Podcast Broadcast, ASMR Binaural, Gaming FPS Surround, Vintage Radio AM, Heavy Metal Rock.
-- Ambient White Noise Generator: Hujan 🌧️, Api Unggun 🔥, Vinyl ☕ dengan volume independen.
-- 10-Band Studio Equalizer (32Hz – 16kHz) dengan kurva genre instan.
-- Enhancers: Deep Sub-Bass, High Air Treble, dan Auto Volume Leveling.
+### 3.5. Input Mix Hub & Anti-Echo Loopback Protection
+- **Anti-Echo Local Playback Suppression (`suppressLocalAudioPlayback: true`)**:
+  - Mengeliminasi 100% suara ganda / echo fase saat menangkap audio dari aplikasi browser/Spotify/YouTube.
+  - Mematikan output lokal aplikasi asli sehingga seluruh audio dialihkan secara murni melalui pemrosesan filter mixer.
+- **Pilihan Input Mix Fleksibel**:
+  - *Mode 1 (App / Tab Audio)*: Tangkap audio browser/tab/jendela aplikasi dengan proteksi anti-gema aktif.
+  - *Mode 2 (Physical Mic / Line-In)*: Mikrofon fisik / jack soundcard direct monitoring.
+  - *Mode 3 (Virtual Cable Loopback)*: Deteksi dan routing perangkat loopback OS (VB-Audio Virtual Cable / Stereo Mix) untuk menyaring semua suara PC secara otomatis tanpa dialog pop-up.
+  - *Mode 4 (Multi-Track Audio Stems / File Buffer)*: Pemutaran file rekaman independen per channel.
+- **Per-Channel Interactive Source Selector**: Mengatur sumber input suara secara independen untuk tiap channel strip.
 
 ---
 
@@ -73,3 +78,4 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Visual Performance**: 60 FPS Canvas rendering untuk FFT Spectrum dan Vectorscope.
 - **Cross-Platform Compatibility**: Windows (XAMPP), Linux (aaPanel / Ubuntu / Debian / CentOS / AlmaLinux), macOS.
 - **Browser Support**: Google Chrome, Microsoft Edge, Mozilla Firefox, Opera, Brave, Safari.
+

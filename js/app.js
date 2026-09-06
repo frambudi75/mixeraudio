@@ -195,13 +195,17 @@ class StudioApp {
     this.safeOn('btn-export-wav', 'click', () => this.exportWav());
     this.safeOn('btn-export-stems', 'click', () => this.exportAllStems());
     this.safeOn('btn-save-project', 'click', () => this.openSaveModal());
-    this.safeOn('btn-load-project', 'click', () => this.openProjectsModal());
+    // Input Mix Hub Header Buttons
+    const openInputHub = async () => {
+      await this.engine.init();
+      await this.routing.enumerateDevices();
+      this.updateRoutingModalTargetChannel();
+      const modal = document.getElementById('routing-modal');
+      if (modal) modal.classList.add('active');
+    };
 
-    // Quick App Capture Header Button
-    this.safeOn('btn-quick-app-capture', 'click', async () => {
-      const ch = this.engine.channels.find(c => c.id === this.selectedChannelId) || this.engine.channels[0];
-      await this.routing.captureApplicationAudio(ch);
-    });
+    this.safeOn('btn-open-input-mix-hub', 'click', openInputHub);
+    this.safeOn('btn-open-routing', 'click', openInputHub);
 
     // File Drag and Drop onto Window
     this.setupFileDragDrop();
@@ -633,24 +637,48 @@ class StudioApp {
     }
     if (modalMasterOutputSelect) {
       modalMasterOutputSelect.addEventListener('change', (e) => handleOutputChange(e.target.value));
-    }
-
     this.safeOn('btn-modal-capture-app', 'click', async () => {
+      const antiEchoChk = document.getElementById('chk-anti-echo');
+      const antiEcho = antiEchoChk ? antiEchoChk.checked : true;
       const ch = this.engine.channels.find(c => c.id === this.selectedChannelId) || this.engine.channels[0];
-      await this.routing.captureApplicationAudio(ch);
+      await this.routing.captureApplicationAudio(ch, antiEcho);
     });
 
     this.safeOn('btn-route-hw-input', 'click', async () => {
       const hwSelect = document.getElementById('hw-input-select');
       const deviceId = hwSelect ? hwSelect.value : 'default';
       const ch = this.engine.channels.find(c => c.id === this.selectedChannelId) || this.engine.channels[0];
-      await this.routing.routeHardwareInputToChannel(deviceId, ch);
+      await this.routing.routeHardwareInputToChannel(deviceId, ch, 'MIC / LINE-IN');
+    });
+
+    this.safeOn('btn-route-virtual-cable', 'click', async () => {
+      const vcSelect = document.getElementById('virtual-cable-select');
+      const deviceId = vcSelect ? vcSelect.value : 'default';
+      const ch = this.engine.channels.find(c => c.id === this.selectedChannelId) || this.engine.channels[0];
+      await this.routing.routeHardwareInputToChannel(deviceId, ch, 'VIRTUAL CABLE');
     });
 
     this.safeOn('btn-refresh-devices', 'click', async () => {
       await this.routing.enumerateDevices();
       this.showToast('Daftar perangkat jack audio diperbarui.', 'info');
     });
+  }
+
+  updateRoutingModalTargetChannel() {
+    const ch = this.engine.channels.find(c => c.id === this.selectedChannelId) || this.engine.channels[0];
+    const targetLabel = document.getElementById('routing-target-channel-name');
+    if (targetLabel && ch) {
+      targetLabel.textContent = `${ch.name} (CH ${ch.id})`;
+    }
+  }
+
+  updateChannelSourceBadge(channelId, label) {
+    const badge = document.getElementById(`source-badge-${channelId}`);
+    if (badge) {
+      badge.textContent = `SRC: ${label.toUpperCase()}`;
+      badge.style.color = '#38bdf8';
+      badge.style.fontWeight = '700';
+    }
   }
 
   createDefaultChannel(name, color = '#3b82f6') {
@@ -674,7 +702,7 @@ class StudioApp {
         <div class="scribble-strip">
           <input type="text" class="track-name-input" value="${channel.name}">
         </div>
-        <div class="strip-source-badge" id="source-badge-${channel.id}" title="Source Type">SRC: ${channel.sourceType.toUpperCase()}</div>
+        <div class="strip-source-badge interactive-source-badge" id="source-badge-${channel.id}" title="Klik untuk ganti input sumber suara (Mic/App/Virtual Cable)">SRC: ${channel.sourceType.toUpperCase()}</div>
       </div>
 
       <!-- Gain / Trim Section -->
@@ -789,11 +817,6 @@ class StudioApp {
     this.bindChannelStripEvents(strip, channel);
   }
 
-  updateChannelSourceBadge(channelId, text) {
-    const badge = document.getElementById(`source-badge-${channelId}`);
-    if (badge) badge.textContent = `SRC: ${text}`;
-  }
-
   generateLedSegmentsHtml() {
     let html = '';
     for (let i = 0; i < 16; i++) {
@@ -806,6 +829,19 @@ class StudioApp {
   }
 
   bindChannelStripEvents(strip, channel) {
+    const sourceBadge = strip.querySelector('.strip-source-badge');
+    if (sourceBadge) {
+      sourceBadge.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        this.selectChannel(channel.id);
+        await this.engine.init();
+        await this.routing.enumerateDevices();
+        this.updateRoutingModalTargetChannel();
+        const modal = document.getElementById('routing-modal');
+        if (modal) modal.classList.add('active');
+      });
+    }
+
     const nameInput = strip.querySelector('.track-name-input');
     if (nameInput) {
       nameInput.addEventListener('change', (e) => {
