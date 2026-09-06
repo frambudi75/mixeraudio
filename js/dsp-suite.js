@@ -102,15 +102,46 @@ export class DspSuite {
     this.ambientGainNode.gain.value = 0.4;
     this.ambientGainNode.connect(this.engine.masterBus);
 
+    // 7. Karaoke Mid-Side Vocal Remover Node
+    this.karaokeActive = false;
+    this.karaokeGain = ctx.createGain();
+    this.karaokeGain.gain.value = 1.0;
+
+    // Vocal Notch Filter (Center Cancellation band 300Hz - 4kHz)
+    this.karaokeFilter = ctx.createBiquadFilter();
+    this.karaokeFilter.type = 'peaking';
+    this.karaokeFilter.frequency.value = 1500;
+    this.karaokeFilter.Q.value = 0.6;
+    this.karaokeFilter.gain.value = 0;
+
+    // 8. OBS Streaming Sync Broadcast Channel
+    this.obsBc = new BroadcastChannel('studiomaster_obs_sync');
+
     // Insert DSP Suite into Master Bus routing:
     this.engine.masterBus.disconnect();
     this.engine.masterBus.connect(this.preampNode);
-    this.preampNode.connect(this.eqInput);
+    this.preampNode.connect(this.karaokeFilter);
+    this.karaokeFilter.connect(this.eqInput);
     this.eqOutput.connect(this.subBassFilter);
     this.subBassFilter.connect(this.airTrebleFilter);
     this.airTrebleFilter.connect(this.panner8D);
     this.panner8D.connect(this.autoLevelerNode);
     this.autoLevelerNode.connect(this.engine.masterEQ.input);
+  }
+
+  toggleKaraokeMode() {
+    this.karaokeActive = !this.karaokeActive;
+    const t = this.ctx.currentTime;
+    if (this.karaokeActive) {
+      // Cut vocal center band by -18dB and boost sides
+      this.karaokeFilter.gain.setTargetAtTime(-20, t, 0.05);
+      this.subBassFilter.gain.setTargetAtTime(4, t, 0.05); // Keep bass punchy
+      this.app.showToast('🎤 Karaoke Mode (Vocal Suppressor) AKTIF', 'success');
+    } else {
+      this.karaokeFilter.gain.setTargetAtTime(0, t, 0.05);
+      this.app.showToast('🎤 Karaoke Mode Dinonaktifkan', 'info');
+    }
+    return this.karaokeActive;
   }
 
   // --- 10-Band Graphic EQ Controls ---

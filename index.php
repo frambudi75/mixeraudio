@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudioMaster Pro - Digital Audio Mixing Console & Workstation</title>
   <meta name="description" content="Professional Studio Digital Audio Mixing Console with real-time Web Audio API, DSP rack, 60FPS visualizers, multi-track stems, input/output audio jack routing, broadcast auto-ducking, and MIDI controller support.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.0.4">
-  <link rel="stylesheet" href="css/main.css?v=3.0.4">
-  <link rel="stylesheet" href="css/mixer.css?v=3.0.4">
-  <link rel="stylesheet" href="css/visualizers.css?v=3.0.4">
-  <link rel="stylesheet" href="css/dsp-suite.css?v=3.0.4">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3.1.0">
+  <link rel="manifest" href="manifest.json?v=3.1.0">
+  <meta name="theme-color" content="#06b6d4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="css/main.css?v=3.1.0">
+  <link rel="stylesheet" href="css/mixer.css?v=3.1.0">
+  <link rel="stylesheet" href="css/visualizers.css?v=3.1.0">
+  <link rel="stylesheet" href="css/dsp-suite.css?v=3.1.0">
 </head>
 <body>
 
@@ -19,7 +23,7 @@
       <div class="brand-logo">⚡</div>
       <div class="brand-info">
         <h1>StudioMaster Pro</h1>
-        <span class="badge-version">DSP CONSOLE v3.0 MASTER</span>
+        <span class="badge-version">DSP CONSOLE v3.1 MASTER</span>
       </div>
     </div>
 
@@ -63,9 +67,34 @@
         <option value="yamaha">🎚️ Yamaha Digital 02R</option>
       </select>
 
+      <!-- Live Voice Changer Selector -->
+      <select id="voice-changer-select" style="background:#131822; border:1px solid #8b5cf6; color:#c084fc; font-size:11px; font-weight:700; padding:6px 8px; border-radius:6px; cursor:pointer;" title="Live Voice Changer (Robot, Chipmunk, Monster Deep, Alien, Megaphone)">
+        <option value="normal">🎙️ Voice: Clean Studio</option>
+        <option value="robot">🤖 Voice: Robot Vocoder</option>
+        <option value="chipmunk">🐿️ Voice: Chipmunk Up</option>
+        <option value="deep">😈 Voice: Deep Monster</option>
+        <option value="alien">👽 Voice: Alien Space</option>
+        <option value="megaphone">📢 Voice: Megaphone AM</option>
+      </select>
+
+      <!-- Real-time Karaoke Vocal Cut -->
+      <button class="btn-action" id="btn-toggle-karaoke" title="Karaoke Mode: Hilangkan Vokal Lagu secara Real-Time">
+        🎤 Karaoke Mode
+      </button>
+
       <!-- Broadcast Auto-Ducking -->
       <button class="btn-action" id="btn-toggle-ducking" title="Podcast Auto-Ducking: Musik otomatis mengecil saat bicara di Mic">
-        🎙️ Auto-Duck (Podcast)
+        🎙️ Auto-Duck
+      </button>
+
+      <!-- OBS Studio Live Stream Overlay -->
+      <button class="btn-action" id="btn-open-obs-modal" title="Buka URL OBS Studio Browser Source Widget Transparan">
+        📺 OBS Overlay
+      </button>
+
+      <!-- PWA Install Button (Dynamic) -->
+      <button class="btn-action btn-accent-emerald" id="btn-pwa-install" style="display:none;" title="Install StudioMaster Pro ke Desktop/Laptop">
+        📲 Install App
       </button>
 
       <!-- DSP Equalizer & Presets Button -->
@@ -92,7 +121,7 @@
 
       <!-- Export Stems Multi-track -->
       <button class="btn-action" id="btn-export-stems" title="Export Semua Track Terpisah (Stems Multi-Track)">
-        📦 All Stems
+        📦 Stems
       </button>
 
       <button class="btn-action btn-accent-blue" id="btn-export-wav" title="Export Lossless 16-Bit Master WAV">
@@ -682,10 +711,103 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       MODAL 4: OBS Studio Live Stream Overlay Widget Link
+       ========================================================================== -->
+  <div class="modal-overlay" id="obs-modal">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">📺</span>
+          <div>
+            <h3 style="margin:0; font-size:15px; color:#fff;">OBS Studio Streaming Overlay</h3>
+            <p style="margin:0; font-size:11px; color:#94a3b8;">Integrasikan visualizer Spectrum & VU Meter transparan langsung ke OBS Studio / Streamlabs.</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('obs-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#131822; padding:12px; border-radius:8px; border:1px solid #233044;">
+          <label style="font-size:11px; color:#38bdf8; font-weight:700; display:block; margin-bottom:6px;">🔗 URL BROWSER SOURCE OBS (TRANSPARAN):</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="obs-url-input" readonly value="" style="flex:1; background:#090d14; border:1px solid #38bdf8; color:#fff; padding:8px 12px; border-radius:6px; font-family:var(--font-mono); font-size:12px;">
+            <button class="btn-action btn-accent-blue" id="btn-copy-obs-url">📋 Copy URL</button>
+          </div>
+        </div>
+        <div style="background:#090d14; padding:12px; border-radius:8px; border:1px solid #1e293b; font-size:11px; color:#94a3b8; line-height:1.5;">
+          <b style="color:#f1f5f9;">Cara Pasang di OBS Studio:</b>
+          <ol style="margin-left:18px; margin-top:4px;">
+            <li>Di OBS Studio, klik tombol <b>+ (Add Source)</b> di panel Sources.</li>
+            <li>Pilih <b>Browser Source</b> & beri nama <i>"StudioMaster Mixer"</i>.</li>
+            <li>Paste URL di atas ke kolom <b>URL</b>.</li>
+            <li>Atur Width: <code>1920</code>, Height: <code>1080</code> (atau <code>600x120</code> untuk mini banner).</li>
+            <li>Centang <i>"Shutdown source when not visible"</i> lalu klik OK.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="overlay.php" target="_blank" class="btn-action" style="text-decoration:none;">👁️ Buka Preview Overlay</a>
+        <button class="btn-action btn-accent-blue" onclick="document.getElementById('obs-modal').classList.remove('active')">Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 5: Custom Soundboard Pad Sampler Editor
+       ========================================================================== -->
+  <div class="modal-overlay" id="pad-editor-modal">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🎙️</span>
+          <div>
+            <h3 style="margin:0; font-size:15px; color:#fff;">Custom Soundboard Sampler</h3>
+            <p style="margin:0; font-size:11px; color:#94a3b8;" id="pad-editor-subtitle">Atur suara untuk Pad X</p>
+          </div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('pad-editor-modal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+        <input type="hidden" id="edit-pad-id" value="1">
+        
+        <!-- Option A: Record Live from Mic -->
+        <div style="background:#131822; padding:12px; border-radius:8px; border:1px solid #ef4444;">
+          <h4 style="font-size:12px; color:#f87171; margin-bottom:6px;">🎙️ OPSI 1: Rekam Suara Langsung dari Mic (2 Detik)</h4>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Tekan tombol di bawah lalu bicara / buat bunyi jingle di mic:</p>
+          <button class="btn-action btn-accent-gold" id="btn-record-mic-sample" style="width:100%; justify-content:center;">
+            🔴 Mulai Rekam ke Pad Ini
+          </button>
+        </div>
+
+        <!-- Option B: Pick Audio File -->
+        <div style="background:#131822; padding:12px; border-radius:8px; border:1px solid #06b6d4;">
+          <h4 style="font-size:12px; color:#38bdf8; margin-bottom:6px;">📂 OPSI 2: Pilih File Audio Sendiri (MP3 / WAV)</h4>
+          <input type="file" id="pad-file-input" accept="audio/*" style="width:100%; font-size:11px; color:#94a3b8;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="document.getElementById('pad-editor-modal').classList.remove('active')">Batal</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Module Entry Point -->
-  <script type="module" src="js/app.js?v=3.0.4"></script>
+  <script type="module" src="js/app.js?v=3.1.0"></script>
+  
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js?v=3.1.0').then(reg => {
+          console.log('StudioMaster Pro PWA ServiceWorker Registered:', reg.scope);
+        }).catch(err => {
+          console.warn('ServiceWorker registration failed:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>

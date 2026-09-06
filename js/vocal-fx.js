@@ -188,4 +188,160 @@ export class VocalFx {
     }
     return freqs;
   }
+
+  /**
+   * Create a Real-Time Live Voice Changer Node Chain (Robot, Chipmunk, Deep Voice, Alien, Megaphone)
+   */
+  static createVoiceChanger(audioCtx) {
+    const input = audioCtx.createGain();
+    const output = audioCtx.createGain();
+
+    // 1. Dry / Bypass path
+    const dryGain = audioCtx.createGain();
+    dryGain.gain.value = 1.0;
+    input.connect(dryGain);
+    dryGain.connect(output);
+
+    // 2. Wet FX path
+    const wetGain = audioCtx.createGain();
+    wetGain.gain.value = 0.0;
+
+    // Filter nodes for Megaphone / Radio
+    const bpFilter = audioCtx.createBiquadFilter();
+    bpFilter.type = 'bandpass';
+    bpFilter.frequency.value = 1400;
+    bpFilter.Q.value = 1.8;
+
+    // Distortion / Saturation Curve
+    const distortion = audioCtx.createWaveShaper();
+    const makeDistCurve = (amount = 20) => {
+      const n = 256;
+      const curve = new Float32Array(n);
+      for (let i = 0; i < n; ++i) {
+        const x = (i * 2) / n - 1;
+        curve[i] = ((Math.PI + amount) * x) / (Math.PI + amount * Math.abs(x));
+      }
+      return curve;
+    };
+    distortion.curve = makeDistCurve(25);
+    distortion.oversample = '2x';
+
+    // Ring Modulator (Robot / Alien Voice)
+    const carrierOsc = audioCtx.createOscillator();
+    carrierOsc.type = 'sawtooth';
+    carrierOsc.frequency.value = 65; // Robot fundamental
+    carrierOsc.start();
+
+    const ringModGain = audioCtx.createGain();
+    ringModGain.gain.value = 0; // modulated by carrier
+    carrierOsc.connect(ringModGain.gain);
+
+    // Alien LFO Modulator
+    const alienLfo = audioCtx.createOscillator();
+    alienLfo.frequency.value = 8.5;
+    const alienLfoGain = audioCtx.createGain();
+    alienLfoGain.gain.value = 40;
+    alienLfo.connect(alienLfoGain);
+    alienLfo.start();
+
+    // Sub-bass Pitch Filter (Deep Voice)
+    const lowShelf = audioCtx.createBiquadFilter();
+    lowShelf.type = 'lowshelf';
+    lowShelf.frequency.value = 180;
+    lowShelf.gain.value = 0;
+
+    // High Peaking Formant (Chipmunk)
+    const highFormant = audioCtx.createBiquadFilter();
+    highFormant.type = 'peaking';
+    highFormant.frequency.value = 2400;
+    highFormant.Q.value = 3.0;
+    highFormant.gain.value = 0;
+
+    // Connect node chain
+    input.connect(lowShelf);
+    lowShelf.connect(highFormant);
+    highFormant.connect(bpFilter);
+    bpFilter.connect(distortion);
+    distortion.connect(ringModGain);
+    ringModGain.connect(wetGain);
+    wetGain.connect(output);
+
+    let currentMode = 'normal';
+
+    const setVoiceMode = (mode) => {
+      currentMode = mode;
+      const t = audioCtx.currentTime;
+
+      // Default reset
+      dryGain.gain.setTargetAtTime(0, t, 0.02);
+      wetGain.gain.setTargetAtTime(1.0, t, 0.02);
+      lowShelf.gain.setTargetAtTime(0, t, 0.02);
+      highFormant.gain.setTargetAtTime(0, t, 0.02);
+      bpFilter.frequency.setTargetAtTime(1400, t, 0.02);
+      bpFilter.Q.setTargetAtTime(0.5, t, 0.02);
+
+      switch (mode) {
+        case 'normal':
+          dryGain.gain.setTargetAtTime(1.0, t, 0.02);
+          wetGain.gain.setTargetAtTime(0.0, t, 0.02);
+          break;
+
+        case 'robot':
+          // Pure Ring Modulation
+          carrierOsc.type = 'square';
+          carrierOsc.frequency.setTargetAtTime(55, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(2000, t, 0.02);
+          bpFilter.Q.setTargetAtTime(0.7, t, 0.02);
+          distortion.curve = makeDistCurve(15);
+          break;
+
+        case 'chipmunk':
+          // High formant & bright harmonic lift
+          carrierOsc.type = 'sine';
+          carrierOsc.frequency.setTargetAtTime(8, t, 0.02);
+          highFormant.frequency.setTargetAtTime(2800, t, 0.02);
+          highFormant.gain.setTargetAtTime(14, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(3200, t, 0.02);
+          bpFilter.Q.setTargetAtTime(1.2, t, 0.02);
+          break;
+
+        case 'deep':
+          // Monster deep sub-octave & warm drive
+          carrierOsc.type = 'triangle';
+          carrierOsc.frequency.setTargetAtTime(35, t, 0.02);
+          lowShelf.frequency.setTargetAtTime(160, t, 0.02);
+          lowShelf.gain.setTargetAtTime(15, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(800, t, 0.02);
+          bpFilter.Q.setTargetAtTime(0.8, t, 0.02);
+          distortion.curve = makeDistCurve(35);
+          break;
+
+        case 'alien':
+          // Tremolo & rapid phase frequency shift
+          carrierOsc.type = 'sawtooth';
+          carrierOsc.frequency.setTargetAtTime(110, t, 0.02);
+          alienLfo.frequency.setTargetAtTime(12, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(1800, t, 0.02);
+          bpFilter.Q.setTargetAtTime(2.5, t, 0.02);
+          break;
+
+        case 'megaphone':
+          // Bandpass 500Hz-3kHz with harsh saturation
+          carrierOsc.frequency.setTargetAtTime(0.1, t, 0.02);
+          bpFilter.frequency.setTargetAtTime(1500, t, 0.02);
+          bpFilter.Q.setTargetAtTime(3.5, t, 0.02);
+          distortion.curve = makeDistCurve(60);
+          break;
+      }
+    };
+
+    setVoiceMode('normal');
+
+    return {
+      input,
+      output,
+      setVoiceMode,
+      getMode: () => currentMode
+    };
+  }
 }

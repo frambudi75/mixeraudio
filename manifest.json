@@ -1,0 +1,19 @@
+{
+  "name": "StudioMaster Pro - Digital Audio Workstation",
+  "short_name": "StudioMaster",
+  "description": "Professional 64-Bit Float Digital Audio Mixing Console and DSP Studio Suite",
+  "start_url": "index.php",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#07090e",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "multimedia", "productivity", "utilities"]
+}

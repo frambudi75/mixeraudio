@@ -212,7 +212,7 @@ class StudioApp {
   }
 
   // ==========================================================================
-  // Advanced Features: Theme Switcher, Auto-Ducking, Stems Exporter
+  // Advanced Features: Theme, Voice Changer, Karaoke, OBS, PWA, Soundboard
   // ==========================================================================
   bindAdvancedFeatures() {
     // 1. Theme Switcher
@@ -243,7 +243,102 @@ class StudioApp {
       });
     }
 
-    // 3. Shortcuts Modal Button
+    // 3. Real-Time Karaoke Mode Toggle (Center Vocal Cut)
+    const karaokeBtn = document.getElementById('btn-toggle-karaoke');
+    if (karaokeBtn) {
+      karaokeBtn.addEventListener('click', () => {
+        const active = this.dspSuite.toggleKaraokeMode();
+        karaokeBtn.classList.toggle('btn-accent-blue', active);
+      });
+    }
+
+    // 4. Live Voice Changer Selector (Robot, Chipmunk, Deep Monster, Alien, Megaphone)
+    const voiceSelect = document.getElementById('voice-changer-select');
+    if (voiceSelect) {
+      voiceSelect.addEventListener('change', async (e) => {
+        await this.engine.init();
+        const mode = e.target.value;
+        if (!this.voiceChangerNode) {
+          this.voiceChangerNode = VocalFx.createVoiceChanger(this.engine.ctx);
+          // Connect to master or mic channel
+          this.engine.masterBus.connect(this.voiceChangerNode.input);
+          this.voiceChangerNode.output.connect(this.engine.ctx.destination);
+        }
+        this.voiceChangerNode.setVoiceMode(mode);
+        this.showToast(`Voice Changer: ${voiceSelect.options[voiceSelect.selectedIndex].text}`, 'success');
+      });
+    }
+
+    // 5. OBS Studio Overlay Modal & Copy URL
+    this.safeOn('btn-open-obs-modal', 'click', () => {
+      const modal = document.getElementById('obs-modal');
+      const input = document.getElementById('obs-url-input');
+      if (input) {
+        const fullUrl = window.location.href.split('?')[0].replace('index.php', '') + 'overlay.php';
+        input.value = fullUrl;
+      }
+      if (modal) modal.classList.add('active');
+    });
+
+    this.safeOn('btn-copy-obs-url', 'click', () => {
+      const input = document.getElementById('obs-url-input');
+      if (input) {
+        navigator.clipboard.writeText(input.value);
+        this.showToast('URL OBS Overlay berhasil dicopy ke clipboard!', 'success');
+      }
+    });
+
+    // 6. PWA Install Prompt Handler
+    const pwaBtn = document.getElementById('btn-pwa-install');
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (pwaBtn) pwaBtn.style.display = 'inline-flex';
+    });
+
+    if (pwaBtn) {
+      pwaBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            this.showToast('StudioMaster Pro berhasil diinstall!', 'success');
+          }
+          deferredPrompt = null;
+          pwaBtn.style.display = 'none';
+        }
+      });
+    }
+
+    // 7. Custom Soundboard Pad Editor Actions
+    this.safeOn('btn-record-mic-sample', 'click', async () => {
+      const padId = parseInt(document.getElementById('edit-pad-id').value) || 1;
+      this.showToast(`Mulai merekam 2 detik untuk Pad ${padId}... Bicara sekarang!`, 'warn');
+      const success = await this.samplePads.recordMicToPad(padId, 2.0);
+      if (success) {
+        this.showToast(`Suara mic berhasil disimpan ke Pad ${padId}!`, 'success');
+        const modal = document.getElementById('pad-editor-modal');
+        if (modal) modal.classList.remove('active');
+      }
+    });
+
+    const padFileInput = document.getElementById('pad-file-input');
+    if (padFileInput) {
+      padFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const padId = parseInt(document.getElementById('edit-pad-id').value) || 1;
+        const success = await this.samplePads.loadCustomFileToPad(padId, file);
+        if (success) {
+          this.showToast(`File "${file.name}" berhasil dipasang ke Pad ${padId}!`, 'success');
+          const modal = document.getElementById('pad-editor-modal');
+          if (modal) modal.classList.remove('active');
+        }
+      });
+    }
+
+    // 8. Shortcuts Modal Button
     this.safeOn('btn-open-shortcuts', 'click', () => {
       const modal = document.getElementById('shortcuts-modal');
       if (modal) modal.classList.add('active');
@@ -1123,7 +1218,20 @@ class StudioApp {
     const secs = Math.floor(cur % 60);
     const ms = Math.floor((cur % 1) * 100);
 
-    this.timecodeEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+    const tcStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+    this.timecodeEl.textContent = tcStr;
+
+    // Broadcast to OBS Studio Overlay
+    if (this.dspSuite && this.dspSuite.obsBc) {
+      const freq = this.visualizer && this.visualizer.freqData ? Array.from(this.visualizer.freqData.slice(0, 24)) : [];
+      this.dspSuite.obsBc.postMessage({
+        timecode: tcStr,
+        preset: this.dspSuite.activePresetName || 'STUDIO CLEAN',
+        leftLevel: this.engine.isPlaying ? Math.min(1.0, (this.engine.masterGain || 1.0) * 0.7) : 0,
+        rightLevel: this.engine.isPlaying ? Math.min(1.0, (this.engine.masterGain || 1.0) * 0.75) : 0,
+        freqData: freq
+      });
+    }
   }
 
   showToast(message, type = 'info') {

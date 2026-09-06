@@ -44,8 +44,38 @@ export class SamplePads {
       `;
 
       padEl.addEventListener('pointerdown', (e) => {
+        if (e.button === 0) { // Left click trigger
+          e.preventDefault();
+          this.triggerPad(pad.id);
+        }
+      });
+
+      // Right Click -> Open Pad Sampler Editor
+      padEl.addEventListener('contextmenu', (e) => {
         e.preventDefault();
-        this.triggerPad(pad.id);
+        const modal = document.getElementById('pad-editor-modal');
+        const padIdInput = document.getElementById('edit-pad-id');
+        const subtitle = document.getElementById('pad-editor-subtitle');
+        if (padIdInput) padIdInput.value = pad.id;
+        if (subtitle) subtitle.textContent = `Atur suara untuk Pad ${pad.id} (${pad.name}) [Shortcut: ${pad.key}]`;
+        if (modal) modal.classList.add('active');
+      });
+
+      // Drag & Drop audio file directly to Pad
+      padEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        padEl.style.outline = '2px solid #06b6d4';
+      });
+      padEl.addEventListener('dragleave', () => {
+        padEl.style.outline = '';
+      });
+      padEl.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        padEl.style.outline = '';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          await this.loadCustomFileToPad(pad.id, e.dataTransfer.files[0]);
+        }
       });
 
       containerEl.appendChild(padEl);
@@ -83,6 +113,22 @@ export class SamplePads {
     const t = ctx.currentTime;
     const dest = this.engine.masterBus;
 
+    // Check if custom audio buffer is assigned to this pad
+    if (pad.customBuffer) {
+      try {
+        const src = ctx.createBufferSource();
+        src.buffer = pad.customBuffer;
+        const padGain = ctx.createGain();
+        padGain.gain.value = 1.0;
+        src.connect(padGain);
+        padGain.connect(dest);
+        src.start(t);
+        return;
+      } catch (e) {
+        console.warn('Error playing custom pad buffer:', e);
+      }
+    }
+
     switch (pad.type) {
       case 'kick808': {
         const osc = ctx.createOscillator();
@@ -100,53 +146,53 @@ export class SamplePads {
 
       case 'snare': {
         const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.frequency.setValueAtTime(220, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.1);
+        oscGain.gain.setValueAtTime(0.7, t);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+        osc.connect(oscGain); oscGain.connect(dest);
+        osc.start(t); osc.stop(t + 0.15);
+
         const noise = this.createNoiseBuffer(ctx, 0.2);
         const noiseSrc = ctx.createBufferSource();
         noiseSrc.buffer = noise;
-
-        const gainO = ctx.createGain();
-        const gainN = ctx.createGain();
-
-        osc.frequency.setValueAtTime(220, t);
-        osc.frequency.exponentialRampToValueAtTime(80, t + 0.1);
-        gainO.gain.setValueAtTime(0.7, t);
-        gainO.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-
-        gainN.gain.setValueAtTime(0.8, t);
-        gainN.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-
-        osc.connect(gainO); gainO.connect(dest);
-        noiseSrc.connect(gainN); gainN.connect(dest);
-
-        osc.start(t); osc.stop(t + 0.15);
-        noiseSrc.start(t); noiseSrc.stop(t + 0.22);
+        const noiseFilter = ctx.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        noiseFilter.frequency.value = 1200;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.8, t);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+        noiseSrc.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(dest);
+        noiseSrc.start(t); noiseSrc.stop(t + 0.2);
         break;
       }
 
       case 'clap': {
-        for (let i = 0; i < 3; i++) {
-          const delay = i * 0.015;
-          const noise = this.createNoiseBuffer(ctx, 0.15);
-          const noiseSrc = ctx.createBufferSource();
-          noiseSrc.buffer = noise;
-          const gain = ctx.createGain();
-          gain.gain.setValueAtTime(0.6 / (i + 1), t + delay);
-          gain.gain.exponentialRampToValueAtTime(0.01, t + delay + 0.15);
-          noiseSrc.connect(gain); gain.connect(dest);
-          noiseSrc.start(t + delay); noiseSrc.stop(t + delay + 0.16);
-        }
+        const noise = this.createNoiseBuffer(ctx, 0.25);
+        const noiseSrc = ctx.createBufferSource();
+        noiseSrc.buffer = noise;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000;
+        filter.Q.value = 1.0;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.9, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.22);
+        noiseSrc.connect(filter); filter.connect(gain); gain.connect(dest);
+        noiseSrc.start(t); noiseSrc.stop(t + 0.25);
         break;
       }
 
       case 'hihat':
       case 'openhat': {
         const isOpen = pad.type === 'openhat';
-        const noise = this.createNoiseBuffer(ctx, isOpen ? 0.35 : 0.06);
+        const noise = this.createNoiseBuffer(ctx, isOpen ? 0.35 : 0.08);
         const noiseSrc = ctx.createBufferSource();
         noiseSrc.buffer = noise;
         const filter = ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 7000;
+        filter.frequency.value = 7500;
         const gain = ctx.createGain();
         gain.gain.setValueAtTime(0.5, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + (isOpen ? 0.3 : 0.05));
@@ -182,7 +228,6 @@ export class SamplePads {
       }
 
       default: {
-        // Simple synthetic ping for other FX
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.frequency.setValueAtTime(440 + padId * 50, t);
@@ -202,5 +247,67 @@ export class SamplePads {
       data[i] = Math.random() * 2 - 1;
     }
     return buffer;
+  }
+
+  /**
+   * Load custom audio file buffer into a specific Pad
+   */
+  async loadCustomFileToPad(padId, file) {
+    await this.engine.init();
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const audioBuffer = await this.engine.ctx.decodeAudioData(arrayBuffer);
+      const pad = this.pads.find(p => p.id === padId);
+      if (pad) {
+        pad.customBuffer = audioBuffer;
+        pad.name = file.name.slice(0, 9).toUpperCase();
+        const padEl = document.querySelector(`.sound-pad[data-pad-id="${padId}"] .pad-label`);
+        if (padEl) padEl.textContent = pad.name;
+        return true;
+      }
+    } catch (err) {
+      console.error('Failed to load custom sample to pad:', err);
+      return false;
+    }
+    return false;
+  }
+
+  /**
+   * Record live audio from microphone directly into a Pad (Sampler)
+   */
+  async recordMicToPad(padId, durationSeconds = 2.0) {
+    await this.engine.init();
+    const pad = this.pads.find(p => p.id === padId);
+    if (!pad) return;
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const arrayBuffer = await blob.arrayBuffer();
+        pad.customBuffer = await this.engine.ctx.decodeAudioData(arrayBuffer);
+        pad.name = `REC ${pad.key}`;
+        const padEl = document.querySelector(`.sound-pad[data-pad-id="${padId}"] .pad-label`);
+        if (padEl) padEl.textContent = pad.name;
+      };
+
+      mediaRecorder.start();
+      setTimeout(() => {
+        if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+      }, durationSeconds * 1000);
+
+      return true;
+    } catch (e) {
+      console.error('Mic recording to pad failed:', e);
+      return false;
+    }
   }
 }

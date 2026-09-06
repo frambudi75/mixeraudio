@@ -68,7 +68,20 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
   - *Mode 2 (Physical Mic / Line-In)*: Mikrofon fisik / jack soundcard direct monitoring.
   - *Mode 3 (Virtual Cable Loopback)*: Deteksi dan routing perangkat loopback OS (VB-Audio Virtual Cable / Stereo Mix) untuk menyaring semua suara PC secara otomatis tanpa dialog pop-up.
   - *Mode 4 (Multi-Track Audio Stems / File Buffer)*: Pemutaran file rekaman independen per channel.
-- **Per-Channel Interactive Source Selector**: Mengatur sumber input suara secara independen untuk tiap channel strip.
+### 3.6. Next-Gen Studio Powerhouse Suite (v3.1)
+- **📲 Progressive Web App (PWA)**:
+  - Beroperasi sebagai software aplikasi desktop/mobile mandiri (Standalone Window) tanpa address bar browser.
+  - Caching aset via Service Worker (`sw.js`) dan konfigurasi PWA (`manifest.json`).
+- **🤖 Live Voice Changer (Vocal FX Modulator)**:
+  - 6 Mode Suara Real-Time: Clean Studio, Robot Vocoder (Ring Modulation), Chipmunk (High Formant), Deep Monster (Sub-octave + Warm Drive), Alien Space (Dual LFO Wobbler), Megaphone AM (Bandpass + Hard Clipper).
+- **🎙️ Custom Soundboard Sampler (Pad 1 - 16)**:
+  - Klik kanan / opsi pada pad untuk merekam vokal/jingle langsung dari mikrofon ke dalam memori pad (Live Sampler 2s).
+  - Drag & drop file MP3/WAV milik pengguna ke masing-masing pad launchpad.
+- **📺 OBS Studio Transparent Streaming Overlay (`overlay.php`)**:
+  - Halaman widget tanpa latar belakang khusus OBS Browser Source (1920x1080 / 600x120 banner).
+  - Sinkronisasi telemetri 60FPS real-time (Spectrum Canvas, Dual VU Meter LED, Timecode, dan status Preset DSP via BroadcastChannel API).
+- **🎤 Real-Time Karaoke Mode (Mid-Side Vocal Suppressor)**:
+  - Algoritma Mid-Side Phase Cancellation yang memotong vokal penyanyi di kanal tengah mono sambil mempertahankan instrumen stereo dan bass kick.
 
 ---
 
@@ -78,4 +91,5 @@ Dibangun di atas **Web Audio API native 64-bit float**, aplikasi ini dirancang u
 - **Visual Performance**: 60 FPS Canvas rendering untuk FFT Spectrum dan Vectorscope.
 - **Cross-Platform Compatibility**: Windows (XAMPP), Linux (aaPanel / Ubuntu / Debian / CentOS / AlmaLinux), macOS.
 - **Browser Support**: Google Chrome, Microsoft Edge, Mozilla Firefox, Opera, Brave, Safari.
+
 
