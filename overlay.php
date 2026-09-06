@@ -135,7 +135,22 @@
   <div class="obs-overlay-card">
     <!-- Brand -->
     <div class="obs-brand">
-      <div class="obs-logo">⚡</div>
+      <div class="obs-logo" style="background:#090d14; border:1px solid #1e293b;">
+        <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+          <defs>
+            <linearGradient id="obsWave" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#06b6d4"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+          <rect x="8" y="20" width="4.5" height="12" rx="2.25" fill="url(#obsWave)"/>
+          <rect x="15.5" y="12" width="4.5" height="24" rx="2.25" fill="url(#obsWave)"/>
+          <rect x="23" y="6" width="4.5" height="36" rx="2.25" fill="#38bdf8"/>
+          <rect x="30.5" y="14" width="4.5" height="20" rx="2.25" fill="url(#obsWave)"/>
+          <rect x="38" y="18" width="4.5" height="14" rx="2.25" fill="url(#obsWave)"/>
+          <circle cx="25.25" cy="16" r="3" fill="#ffffff" stroke="#080b10" stroke-width="1.5"/>
+        </svg>
+      </div>
       <div>
         <div class="obs-title">OverMix Pro</div>
         <div class="obs-badge">🔴 ON-AIR MASTER</div>

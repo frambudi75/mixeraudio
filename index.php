@@ -20,7 +20,23 @@
   <!-- Top Studio Header & Transport Controls -->
   <header class="studio-header">
     <div class="brand-section">
-      <div class="brand-logo">⚡</div>
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="none">
+          <defs>
+            <linearGradient id="hdrWave" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#06b6d4"/>
+              <stop offset="50%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+          <rect x="8" y="20" width="4.5" height="12" rx="2.25" fill="url(#hdrWave)"/>
+          <rect x="15.5" y="12" width="4.5" height="24" rx="2.25" fill="url(#hdrWave)"/>
+          <rect x="23" y="6" width="4.5" height="36" rx="2.25" fill="#38bdf8"/>
+          <rect x="30.5" y="14" width="4.5" height="20" rx="2.25" fill="url(#hdrWave)"/>
+          <rect x="38" y="18" width="4.5" height="14" rx="2.25" fill="url(#hdrWave)"/>
+          <circle cx="25.25" cy="16" r="3" fill="#ffffff" stroke="#080b10" stroke-width="1.5"/>
+        </svg>
+      </div>
       <div class="brand-info">
         <h1>OverMix Pro</h1>
         <span class="badge-version">DSP CONSOLE v3.2 MASTER</span>
