@@ -637,6 +637,8 @@ class StudioApp {
     }
     if (modalMasterOutputSelect) {
       modalMasterOutputSelect.addEventListener('change', (e) => handleOutputChange(e.target.value));
+    }
+
     this.safeOn('btn-modal-capture-app', 'click', async () => {
       const antiEchoChk = document.getElementById('chk-anti-echo');
       const antiEcho = antiEchoChk ? antiEchoChk.checked : true;

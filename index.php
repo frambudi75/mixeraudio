@@ -236,7 +236,7 @@
               <span class="fader-tick">-36</span>
               <span class="fader-tick">-INF</span>
             </div>
-            <div class="fader-slot" id="master-fader-slot" style="height: 200px;">
+            <div class="fader-slot" id="master-fader-slot">
               <div class="fader-cap master-fader-cap" id="master-fader-cap" style="bottom: 66%;">
                 <div class="fader-cap-line" style="background:#ff9999;"></div>
               </div>

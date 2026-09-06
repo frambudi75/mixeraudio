@@ -396,35 +396,36 @@
   display: flex;
   align-items: center;
   position: relative;
-  width: 44px;
+  gap: 8px;
   justify-content: center;
 }
 
 .fader-scale-ticks {
-  position: absolute;
-  left: 2px;
-  height: 180px;
+  height: 190px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   pointer-events: none;
+  text-align: right;
+  min-width: 26px;
+  padding-right: 2px;
 }
 
 .fader-tick {
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8px;
   color: var(--text-dim);
   line-height: 1;
 }
 
 .fader-tick.zero-db {
   color: var(--accent-cyan);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .fader-slot {
   width: 8px;
-  height: 180px;
+  height: 190px;
   background: #050608;
   border: 1px solid #232936;
   border-radius: 4px;
@@ -436,8 +437,8 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 34px;
-  height: 48px;
+  width: 32px;
+  height: 44px;
   background: var(--grad-fader-cap);
   border: 1px solid #4a5568;
   border-radius: 4px;
